@@ -65,6 +65,7 @@
         android:id="@+id/Login"
         style="@style/Widget.AppCompat.Button.Colored"
         android:layout_marginTop="70dp"
+        android:onClick="setLogin"
         app:layout_constraintTop_toBottomOf="@+id/PasswordID"
         app:layout_constraintRight_toRightOf="@+id/PasswordID"
         app:layout_constraintLeft_toLeftOf="@+id/PasswordID"
