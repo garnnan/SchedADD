@@ -59,7 +59,13 @@ public class TabActivity extends AppCompatActivity {
          tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
-        tabLayout.getTabAt(3).setIcon(R.drawable.ic_event_note_black_24dp);
+        int [] iconos = new int[]{R.drawable.ic_accessibility_black_24dp,R.drawable.ic_event_note_black_24dp};
+
+        //tabLayout.getTabAt(1).setIcon(R.drawable.ic_event_note_black_24dp);
+
+        for (int i=0;i<iconos.length;i++)
+            tabLayout.getTabAt(i).setIcon(iconos[i]);
+
 
         /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -147,7 +153,9 @@ public class TabActivity extends AppCompatActivity {
 
             switch (position)
             {
-                case 3:
+                case 0:
+                    return ChildSelector.newInstance();
+                case 1:
                     return Actividades.newInstance();
                 default:
                     return PlaceholderFragment.newInstance(position + 1);
@@ -164,16 +172,14 @@ public class TabActivity extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             SpannableStringBuilder sb;
             ImageSpan span;
-            switch (position) {
+            /*switch (position) {
                 case 0:
                     return "section 1";
                 case 1:
                     return "SECTION 2";
                 case 2:
                     return "SECTION 3";
-                case 3:
-                    return "";
-            }
+            }*/
             return null;
         }
     }
