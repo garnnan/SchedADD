@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             protected void onPostExecute(String s) {
                 if(s.equals("done")){
-                    Intent i = new Intent(MainActivity.this,MainActivity.class);
+                    Intent i = new Intent(MainActivity.this,TabActivity.class);
                     startActivity(i);
                 }
             }
