@@ -71,8 +71,6 @@ public class ChildSelector extends Fragment {
 
         ArrayAdapter adapter = new KidsAdapter(getActivity(),R.layout.kids,list);
 
-        //adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
-
         sp.setAdapter(adapter);
 
         return v;

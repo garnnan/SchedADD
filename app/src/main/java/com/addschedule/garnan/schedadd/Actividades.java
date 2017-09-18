@@ -7,6 +7,14 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseExpandableListAdapter;
+import android.widget.ExpandableListAdapter;
+import android.widget.ExpandableListView;
+import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 
 /**
@@ -59,6 +67,30 @@ public class Actividades extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+
+        /*ExpandableListView expandableListView = (ExpandableListView) getActivity().findViewById(R.id.actividadesList);
+
+
+        List<String> actividades = new ArrayList<>();
+        HashMap<String,List<String>> stringListHashMap = new HashMap<>();
+
+        actividades.add("actividad1");
+        actividades.add("actividad2");
+
+        List<String> subA = new ArrayList<>();
+        subA.add("tas 1.1");
+
+        List<String> subB = new ArrayList<>();
+        subB.add("tas 2.1");
+        subB.add("tas 2.3");
+
+        stringListHashMap.put(actividades.get(0),subA);
+        stringListHashMap.put(actividades.get(1),subB);
+
+        ExpandableListAdapter expandableListAdapter = new ExpandableAdapter(getActivity(),actividades,stringListHashMap);
+
+        expandableListView.setAdapter(expandableListAdapter);*/
+
         return inflater.inflate(R.layout.fragment_actividades, container, false);
     }
 
@@ -99,5 +131,88 @@ public class Actividades extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    private class ExpandableAdapter extends BaseExpandableListAdapter{
+
+        private Context context;
+        private List<String> list;
+        private HashMap<String,List<String>> hashMap;
+
+        public ExpandableAdapter(Context context, List<String> list, HashMap<String, List<String>> hashMap) {
+            this.context = context;
+            this.list = list;
+            this.hashMap = hashMap;
+        }
+
+        @Override
+        public int getGroupCount() {
+            return list.size();
+        }
+
+        @Override
+        public int getChildrenCount(int groupPosition) {
+            return hashMap.get(list.get(groupPosition)).size();
+        }
+
+        @Override
+        public Object getGroup(int groupPosition) {
+            return list.get(groupPosition);
+        }
+
+        @Override
+        public Object getChild(int groupPosition, int childPosition) {
+            return hashMap.get(list.get(groupPosition)).get(childPosition);
+        }
+
+        @Override
+        public long getGroupId(int groupPosition) {
+            return 0;
+        }
+
+        @Override
+        public long getChildId(int groupPosition, int childPosition) {
+            return childPosition;
+        }
+
+        @Override
+        public boolean hasStableIds() {
+            return false;
+        }
+
+        @Override
+        public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
+            String header = (String) getGroup(groupPosition);
+            if(convertView == null)
+            {
+                LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                convertView = inflater.inflate(R.layout.listaexpandible,null);
+            }
+
+            TextView texto = (TextView) convertView.findViewById(R.id.textoExpandible);
+
+            texto.setText(header);
+            return convertView;
+        }
+
+        @Override
+        public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
+            String childtext = (String) getChild(groupPosition,childPosition);
+            if(convertView == null)
+            {
+                LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                convertView = inflater.inflate(R.layout.listaexpandible,null);
+            }
+
+            TextView texto = (TextView) convertView.findViewById(R.id.textoExpandible);
+
+            texto.setText(childtext);
+            return convertView;
+        }
+
+        @Override
+        public boolean isChildSelectable(int groupPosition, int childPosition) {
+            return true;
+        }
     }
 }
