@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
                 catch (Exception e){
                     e.printStackTrace();
                 }
-                return "done";
+                return "dne";
             }
 
             @Override
