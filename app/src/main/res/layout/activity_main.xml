@@ -39,7 +39,7 @@
         android:layout_marginBottom="16dp"
         app:layout_constraintVertical_bias="0.100000024"
         android:hint="Password"
-        android:textColor="?attr/colorAccent" />
+        android:textColor="?attr/actionMenuTextColor" />
 
     <ImageView
         android:layout_height="0dp"
@@ -57,7 +57,8 @@
         android:layout_marginTop="32dp"
         android:layout_marginBottom="32dp" />
 
-    <Button
+
+    <br.com.simplepass.loading_button_lib.customViews.CircularProgressButton
         android:text="Log in"
         android:layout_width="0dp"
         android:layout_height="0dp"
