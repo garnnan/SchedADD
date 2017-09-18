@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
                 if(s.equals("done")){
                     Intent i = new Intent(MainActivity.this,TabActivity.class);
                     startActivity(i);
+                    finish();
                 }
             }
         };
