@@ -64,28 +64,6 @@ public class ChildSelector extends Fragment {
 
        View v = inflater.inflate(R.layout.fragment_child_selector, container, false);
 
-       /* Spinner sp = (Spinner) v.findViewById(R.id.children);
-
-        List<String> list = new ArrayList<String>();
-
-        list.add("Daniel");
-        list.add("Ricardo");
-
-        ArrayAdapter adapter = new KidsAdapter(getActivity(),R.layout.kids,list);
-
-        //adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
-
-        sp.setAdapter(adapter);*/
-
-        RecyclerView recyclerView = (RecyclerView) v.findViewById(R.id.ListaChild);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(v.getContext());
-        RecyclerView.Adapter adapter = new RecyclerAdapter();
-
-        recyclerView.setLayoutManager(layoutManager);
-
-        recyclerView.setAdapter(adapter);
-
-
         return v;
     }
 
