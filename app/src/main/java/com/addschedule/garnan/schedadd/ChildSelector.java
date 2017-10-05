@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,18 +62,7 @@ public class ChildSelector extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
-        View v = inflater.inflate(R.layout.fragment_child_selector, container, false);
-
-        Spinner sp = (Spinner) v.findViewById(R.id.children);
-
-        List<String> list = new ArrayList<String>();
-
-        list.add("Daniel");
-        list.add("Ricardo");
-
-        ArrayAdapter adapter = new KidsAdapter(getActivity(),R.layout.kids,list);
-
-        sp.setAdapter(adapter);
+       View v = inflater.inflate(R.layout.fragment_child_selector, container, false);
 
         return v;
     }
@@ -149,6 +140,48 @@ public class ChildSelector extends Fragment {
             name.setText(getItem(position));
 
             return convertView;
+        }
+    }
+
+    private class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> {
+
+
+        List<String> list = new ArrayList<String>();
+
+        public RecyclerAdapter () {
+            list.add("Daniel");
+            list.add("Ricardo");
+        }
+
+
+        @Override
+        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.kids,null);
+            ViewHolder viewHolder = new ViewHolder(v);
+            return viewHolder;
+        }
+
+        @Override
+        public void onBindViewHolder(ViewHolder holder, int position) {
+            holder.name.setText(list.get(position));
+        }
+
+        @Override
+        public int getItemCount() {
+            return list.size();
+        }
+
+        class ViewHolder extends RecyclerView.ViewHolder {
+
+            public TextView name;
+
+            //TextView name = (TextView) convertView.findViewById(R.id.name);
+
+            public ViewHolder(View itemView) {
+                super(itemView);
+                name = (TextView) itemView.findViewById(R.id.name);
+
+            }
         }
     }
 }
