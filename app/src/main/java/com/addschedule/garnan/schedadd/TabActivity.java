@@ -172,14 +172,14 @@ public class TabActivity extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             SpannableStringBuilder sb;
             ImageSpan span;
-            /*switch (position) {
+            switch (position) {
                 case 0:
-                    return "section 1";
+                    return "Children";
                 case 1:
                     return "SECTION 2";
                 case 2:
                     return "SECTION 3";
-            }*/
+            }
             return null;
         }
     }
