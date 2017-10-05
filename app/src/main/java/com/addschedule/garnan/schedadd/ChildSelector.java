@@ -175,6 +175,7 @@ public class ChildSelector extends Fragment {
 
             public TextView name;
 
+
             //TextView name = (TextView) convertView.findViewById(R.id.name);
 
             public ViewHolder(View itemView) {
