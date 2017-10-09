@@ -64,6 +64,15 @@ public class ChildSelector extends Fragment {
 
        View v = inflater.inflate(R.layout.fragment_child_selector, container, false);
 
+        RecyclerView recyclerView = (RecyclerView) v.findViewById(R.id.ListaChild);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(v.getContext());
+
+        recyclerView.setLayoutManager(layoutManager);
+
+        RecyclerView.Adapter adapter = new RecyclerAdapter();
+
+        recyclerView.setAdapter(adapter);
+
         return v;
     }
 
