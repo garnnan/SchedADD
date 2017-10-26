@@ -160,6 +160,7 @@ public class ChildSelector extends Fragment {
         public RecyclerAdapter () {
             list.add("Daniel");
             list.add("Ricardo");
+            list.add("romulo");
         }
 
 

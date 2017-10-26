@@ -1,9 +1,12 @@
 package com.addschedule.garnan.schedadd;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -59,7 +62,7 @@ public class TabActivity extends AppCompatActivity {
          tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
-        int [] iconos = new int[]{R.drawable.ic_accessibility_black_24dp,R.drawable.ic_event_note_black_24dp};
+        int [] iconos = new int[]{R.drawable.ic_accessibility_black_24dp,R.drawable.ic_event_note_black_24dp,R.drawable.profile_image};
 
         //tabLayout.getTabAt(1).setIcon(R.drawable.ic_event_note_black_24dp);
 
@@ -129,7 +132,9 @@ public class TabActivity extends AppCompatActivity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
+
             View rootView = inflater.inflate(R.layout.fragment_tab, container, false);
+
             TextView textView = (TextView) rootView.findViewById(R.id.section_label);
             textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
             return rootView;
@@ -157,6 +162,8 @@ public class TabActivity extends AppCompatActivity {
                     return ChildSelector.newInstance();
                 case 1:
                     return Actividades.newInstance();
+                case 2:
+                    return AvatarSelector.newInstance();
                 default:
                     return PlaceholderFragment.newInstance(position + 1);
             }
@@ -176,9 +183,9 @@ public class TabActivity extends AppCompatActivity {
                 case 0:
                     return "Children";
                 case 1:
-                    return "SECTION 2";
+                    return "Activities";
                 case 2:
-                    return "SECTION 3";
+                    return "Profile";
             }
             return null;
         }

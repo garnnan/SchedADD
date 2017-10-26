@@ -1,9 +1,11 @@
 package com.addschedule.garnan.schedadd;
 
+import android.app.DialogFragment;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -68,30 +70,44 @@ public class Actividades extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
-        /*ExpandableListView expandableListView = (ExpandableListView) getActivity().findViewById(R.id.actividadesList);
+        View v = inflater.inflate(R.layout.fragment_actividades, container, false);
+
+        ExpandableListView expandableListView = (ExpandableListView) v.findViewById(R.id.actividadesList);
 
 
-        List<String> actividades = new ArrayList<>();
-        HashMap<String,List<String>> stringListHashMap = new HashMap<>();
+        final List<String> actividades = new ArrayList<>();
+        final HashMap<String,List<String>> stringListHashMap = new HashMap<>();
 
-        actividades.add("actividad1");
-        actividades.add("actividad2");
+        actividades.add("Lunes");
+        actividades.add("Martes");
 
         List<String> subA = new ArrayList<>();
-        subA.add("tas 1.1");
+        subA.add("Actividad 1");
 
         List<String> subB = new ArrayList<>();
-        subB.add("tas 2.1");
-        subB.add("tas 2.3");
+        subB.add("Actividad 2");
+        subB.add("Actividad 3");
 
         stringListHashMap.put(actividades.get(0),subA);
         stringListHashMap.put(actividades.get(1),subB);
 
-        ExpandableListAdapter expandableListAdapter = new ExpandableAdapter(getActivity(),actividades,stringListHashMap);
+        ExpandableListAdapter expandableListAdapter = new ExpandableAdapter(v.getContext(),actividades,stringListHashMap);
 
-        expandableListView.setAdapter(expandableListAdapter);*/
+        expandableListView.setAdapter(expandableListAdapter);
 
-        return inflater.inflate(R.layout.fragment_actividades, container, false);
+        expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+
+                DialogFragment dl = new Dialog_activity();
+
+                dl.show(getActivity().getFragmentManager(),stringListHashMap.get(actividades.get(groupPosition)).get(childPosition));
+
+                return true;
+            }
+        });
+
+        return v;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -167,7 +183,7 @@ public class Actividades extends Fragment {
 
         @Override
         public long getGroupId(int groupPosition) {
-            return 0;
+            return groupPosition;
         }
 
         @Override
@@ -185,7 +201,7 @@ public class Actividades extends Fragment {
             String header = (String) getGroup(groupPosition);
             if(convertView == null)
             {
-                LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 convertView = inflater.inflate(R.layout.listaexpandible,null);
             }
 
@@ -200,7 +216,7 @@ public class Actividades extends Fragment {
             String childtext = (String) getChild(groupPosition,childPosition);
             if(convertView == null)
             {
-                LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 convertView = inflater.inflate(R.layout.listaexpandible,null);
             }
 
