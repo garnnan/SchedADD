@@ -2,6 +2,7 @@ package com.addschedule.garnan.schedadd;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -15,6 +16,15 @@ import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.addschedule.garnan.schedadd.Api.Clases.Schedules;
+import com.addschedule.garnan.schedadd.Api.Clases.User;
+import com.github.kevinsawicki.http.HttpRequest;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +48,11 @@ public class ChildSelector extends Fragment {
         // Required empty public constructor
     }
 
+
+    private int id;
+    private int [] sons;
+    private ArrayList<Schedules> schedules;
+
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -45,33 +60,98 @@ public class ChildSelector extends Fragment {
      * @return A new instance of fragment ChildSelector.
      */
     // TODO: Rename and change types and number of parameters
-    public static ChildSelector newInstance() {
+    public static ChildSelector newInstance(int id,int [] sons) {
         ChildSelector fragment = new ChildSelector();
         Bundle args = new Bundle();
+        args.putInt("id",id);
+        args.putIntArray("sons",sons);
         fragment.setArguments(args);
         return fragment;
     }
 
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
+        this.id = getArguments().getInt("id");
+        this.sons = getArguments().getIntArray("sons");
+
         super.onCreate(savedInstanceState);
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
-       View v = inflater.inflate(R.layout.fragment_child_selector, container, false);
+        final View v = inflater.inflate(R.layout.fragment_child_selector, container, false);
 
-        RecyclerView recyclerView = (RecyclerView) v.findViewById(R.id.ListaChild);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(v.getContext());
+        class GetSchedules extends AsyncTask<String,Void,String> {
 
-        recyclerView.setLayoutManager(layoutManager);
+            @Override
+            protected String doInBackground(String... params) {
 
-        RecyclerView.Adapter adapter = new RecyclerAdapter();
+                try {
 
-        recyclerView.setAdapter(adapter);
+                    return HttpRequest.get(params[0]).accept("application/json").basic("raglar","password1234").body();
+                }catch (Exception e){
+                    return "";
+                }
+            }
+
+            @Override
+            protected void onPostExecute(String result) {
+                if(result.isEmpty())
+                {
+                    Toast.makeText(getActivity(),"No hay resultados",Toast.LENGTH_LONG);
+                }
+                else
+                {
+
+                    try {
+                        JSONArray jsonArray = new JSONArray(result);
+
+                        schedules = new ArrayList<>();
+
+                        for (int i=0;i<jsonArray.length();i++){
+                            if(jsonArray.getJSONObject(i).getInt("parentID")==id) {
+
+                                JSONArray sub = jsonArray.getJSONObject(i).getJSONArray("activities");
+
+                                JSONObject obj = jsonArray.getJSONObject(i);
+
+                                int activities [] = new int[sub.length()];
+
+                                for (int j=0;j<sub.length();j++)
+                                    activities[j] = sub.getInt(j);
+
+                                schedules.add(new Schedules(obj.getInt("id"),obj.getInt("sonID"),obj.getString("name"),activities));
+
+                                System.out.println(schedules.get(i).getName());
+                            }
+                        }
+
+                        RecyclerView recyclerView = (RecyclerView) v.findViewById(R.id.ListaChild);
+                        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(v.getContext());
+
+                        recyclerView.setLayoutManager(layoutManager);
+
+                        RecyclerView.Adapter adapter = new RecyclerAdapter();
+
+                        recyclerView.setAdapter(adapter);
+
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }
+        }
+
+        new GetSchedules().execute("https://schedadd-api.herokuapp.com/schedules/");
 
         return v;
     }
@@ -152,6 +232,8 @@ public class ChildSelector extends Fragment {
         }
     }
 
+
+
     private class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> {
 
 
@@ -173,12 +255,12 @@ public class ChildSelector extends Fragment {
 
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
-            holder.name.setText(list.get(position));
+            holder.name.setText(schedules.get(position).getName());
         }
 
         @Override
         public int getItemCount() {
-            return list.size();
+            return schedules.size();
         }
 
         class ViewHolder extends RecyclerView.ViewHolder {
