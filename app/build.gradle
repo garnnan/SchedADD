@@ -20,14 +20,12 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-
-
-
-
+    compile files('C:/Users/garnan/Documents/GitHub/SchedADD/gradle/gson-1.4.jar')
+    compile files('C:/Users/garnan/Documents/GitHub/SchedADD/gradle/http-request-0.1.jar')
     compile 'com.android.support:appcompat-v7:24.2.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha9'
     compile 'br.com.simplepass:loading-button-android:1.7.2'
