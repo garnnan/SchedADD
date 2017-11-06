@@ -32,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
 
     EditText user;
 
+    public final static String FILE_ACTIVITIES_SCHEDULE = "schedules.xml";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 if(s.equals("notdone")){
                     login.stopAnimation();
-                    Toast.makeText(MainActivity.this,"Login incorrecto",Toast.LENGTH_LONG);
+                    Toast.makeText(MainActivity.this,"Login incorrecto",Toast.LENGTH_LONG).show();
                 }
             }
         };

@@ -6,15 +6,16 @@ package com.addschedule.garnan.schedadd.Api.Clases;
 
 public class Schedules {
 
-    private int id,sonId;
+    private int id,sonId,ParentID;
     private String name;
     private int [] activities;
 
-    public Schedules(int id, int sonId, String name, int[] activities) {
+    public Schedules(int id, int sonId, String name, int[] activities,int ParentID) {
         this.id = id;
         this.sonId = sonId;
         this.name = name;
         this.activities = activities;
+        this.ParentID = ParentID;
     }
 
     public int getId() {
@@ -35,6 +36,11 @@ public class Schedules {
 
     public String getName() {
         return name;
+    }
+
+    public int getParentID()
+    {
+        return ParentID;
     }
 
     public void setName(String name) {

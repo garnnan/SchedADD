@@ -3,9 +3,13 @@ package com.addschedule.garnan.schedadd;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,10 +17,21 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.addschedule.garnan.schedadd.Api.Clases.Activity;
+import com.addschedule.garnan.schedadd.Api.Clases.Schedules;
+import com.github.kevinsawicki.http.HttpRequest;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Properties;
 
 
 /**
@@ -37,10 +52,24 @@ public class Actividades extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    private ArrayList<Activity> activities;
+
     private OnFragmentInteractionListener mListener;
+
+    private Properties ppt;
 
     public Actividades() {
         // Required empty public constructor
+
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if(isVisibleToUser) {
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.detach(this).attach(this).commit();
+        }
     }
 
     /**
@@ -63,6 +92,7 @@ public class Actividades extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
     }
 
     @Override
@@ -70,42 +100,104 @@ public class Actividades extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
-        View v = inflater.inflate(R.layout.fragment_actividades, container, false);
+        ppt = new Properties();
 
-        ExpandableListView expandableListView = (ExpandableListView) v.findViewById(R.id.actividadesList);
+        int idSchedule = 0;
+        int parentID = 0;
+        int sonID = 0;
 
+        try {
+            FileInputStream fi = getActivity().openFileInput(MainActivity.FILE_ACTIVITIES_SCHEDULE);
+            ppt.loadFromXML(fi);
+            fi.close();
+            idSchedule = Integer.parseInt(ppt.getProperty("id"));
+            parentID = Integer.parseInt(ppt.getProperty("parentID"));
+            sonID = Integer.parseInt(ppt.getProperty("sonID"));
 
-        final List<String> actividades = new ArrayList<>();
-        final HashMap<String,List<String>> stringListHashMap = new HashMap<>();
+        }catch (Exception e){}
 
-        actividades.add("Lunes");
-        actividades.add("Martes");
+        final View v = inflater.inflate(R.layout.fragment_actividades, container, false);
 
-        List<String> subA = new ArrayList<>();
-        subA.add("Actividad 1");
+        final int finalParentID = parentID;
+        final int finalIdSchedule = idSchedule;
+        class GetActivities extends AsyncTask<String,Void,String> {
 
-        List<String> subB = new ArrayList<>();
-        subB.add("Actividad 2");
-        subB.add("Actividad 3");
-
-        stringListHashMap.put(actividades.get(0),subA);
-        stringListHashMap.put(actividades.get(1),subB);
-
-        ExpandableListAdapter expandableListAdapter = new ExpandableAdapter(v.getContext(),actividades,stringListHashMap);
-
-        expandableListView.setAdapter(expandableListAdapter);
-
-        expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
-            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+            protected String doInBackground(String... params) {
 
-                DialogFragment dl = new Dialog_activity();
+                try {
 
-                dl.show(getActivity().getFragmentManager(),stringListHashMap.get(actividades.get(groupPosition)).get(childPosition));
-
-                return true;
+                    return HttpRequest.get(params[0]).accept("application/json").basic("raglar","password1234").body();
+                }catch (Exception e){
+                    return "";
+                }
             }
-        });
+
+            @Override
+            protected void onPostExecute(String result) {
+                if(result.isEmpty())
+                {
+                    Toast.makeText(getActivity(),"No hay resultados",Toast.LENGTH_LONG);
+                }
+                else
+                {
+
+                    try {
+                        JSONArray jsonArray = new JSONArray(result);
+
+                        activities = new ArrayList<>();
+
+                        for (int i=0;i<jsonArray.length();i++)
+                            if(jsonArray.getJSONObject(i).getInt("parentID")== finalParentID && jsonArray.getJSONObject(i).getInt("scheduleID") == finalIdSchedule) {
+                                //System.out.println(jsonArray.getJSONObject(i).toString());
+                                JSONObject obj = jsonArray.getJSONObject(i);
+                                activities.add(new Activity(obj.getInt("id"),obj.getString("name"),obj.getString("description"),
+                                        obj.getString("state"),obj.getString("steps"),obj.getString("imagePath"),obj.getString("date"),
+                                        obj.getInt("duration"),obj.getInt("scheduleID"),obj.getInt("parentID")));
+                            }
+
+                        ExpandableListView expandableListView = (ExpandableListView) v.findViewById(R.id.actividadesList);
+                        final List<String> actividades = new ArrayList<>();
+                        final HashMap<String,List<String>> stringListHashMap = new HashMap<>();
+
+                        for (int i=0;i<activities.size();i++)
+                        {
+                            String steps = activities.get(i).getSteps().replaceAll(";","\n");
+
+                            actividades.add(activities.get(i).getName());
+                            List<String> tmp = new ArrayList<>();
+
+                            tmp.add(activities.get(i).getDescripcion()+"\n"+steps+"\n"+activities.get(i).getDate()+"\n"+activities.get(i).getDuracion());
+
+                            stringListHashMap.put(actividades.get(i),tmp);
+                        }
+
+                        ExpandableListAdapter expandableListAdapter = new ExpandableAdapter(v.getContext(),actividades,stringListHashMap);
+
+                        expandableListView.setAdapter(expandableListAdapter);
+
+                        expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+                            @Override
+                            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+
+                                DialogFragment dl = new Dialog_activity();
+
+                                dl.show(getActivity().getFragmentManager(),stringListHashMap.get(actividades.get(groupPosition)).get(childPosition));
+
+                                return true;
+                            }
+                        });
+
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }
+        }
+
+        new GetActivities().execute("https://schedadd-api.herokuapp.com/activities/");
 
         return v;
     }
@@ -126,12 +218,14 @@ public class Actividades extends Fragment {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
         }*/
+
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
+
     }
 
     /**
@@ -221,6 +315,7 @@ public class Actividades extends Fragment {
             }
 
             TextView texto = (TextView) convertView.findViewById(R.id.textoExpandible);
+            texto.setTextSize(18);
 
             texto.setText(childtext);
             return convertView;

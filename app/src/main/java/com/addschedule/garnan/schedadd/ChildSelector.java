@@ -26,8 +26,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 
 /**
@@ -52,6 +54,7 @@ public class ChildSelector extends Fragment {
     private int id;
     private int [] sons;
     private ArrayList<Schedules> schedules;
+    private Properties ppt;
 
     /**
      * Use this factory method to create a new instance of
@@ -76,6 +79,8 @@ public class ChildSelector extends Fragment {
 
         this.id = getArguments().getInt("id");
         this.sons = getArguments().getIntArray("sons");
+
+        this.ppt = new Properties();
 
         super.onCreate(savedInstanceState);
     }
@@ -127,9 +132,8 @@ public class ChildSelector extends Fragment {
                                 for (int j=0;j<sub.length();j++)
                                     activities[j] = sub.getInt(j);
 
-                                schedules.add(new Schedules(obj.getInt("id"),obj.getInt("sonID"),obj.getString("name"),activities));
+                                schedules.add(new Schedules(obj.getInt("id"),obj.getInt("sonID"),obj.getString("name"),activities,obj.getInt("parentID")));
 
-                                System.out.println(schedules.get(i).getName());
                             }
                         }
 
@@ -189,49 +193,6 @@ public class ChildSelector extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
 
-    private class KidsAdapter extends ArrayAdapter<String>
-    {
-
-        public KidsAdapter(Context context, int resource, List<String> lista) {
-            super(context, resource,lista);
-        }
-
-        @NonNull
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            if(convertView==null)
-            {
-                LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                convertView = inflater.inflate(R.layout.kids,null);
-
-            }
-
-            TextView name = (TextView) convertView.findViewById(R.id.name);
-
-            name.setText(getItem(position));
-
-            return convertView;
-
-        }
-
-        @Override
-        public View getDropDownView(int position, View convertView, ViewGroup parent) {
-
-            if(convertView==null)
-            {
-                LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                convertView = inflater.inflate(R.layout.kids,null);
-
-            }
-
-            TextView name = (TextView) convertView.findViewById(R.id.name);
-
-            name.setText(getItem(position));
-
-            return convertView;
-        }
-    }
-
 
 
     private class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> {
@@ -256,6 +217,28 @@ public class ChildSelector extends Fragment {
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
             holder.name.setText(schedules.get(position).getName());
+
+            final int pos = position;
+
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(getView().getContext(),"cambio a "+schedules.get(pos).getName(),Toast.LENGTH_SHORT).show();
+
+                    try{
+                        ppt.put("id",schedules.get(pos).getId()+"");
+                        ppt.put("sonID",schedules.get(pos).getSonId()+"");
+                        ppt.put("parentID",schedules.get(pos).getParentID()+"");
+
+                        FileOutputStream fos = getActivity().openFileOutput(MainActivity.FILE_ACTIVITIES_SCHEDULE,getContext().MODE_PRIVATE);
+                        ppt.storeToXML(fos,null);
+                        fos.close();
+
+
+
+                    }catch (Exception e){}
+                }
+            });
         }
 
         @Override
