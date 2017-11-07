@@ -128,6 +128,7 @@ public class Actividades extends Fragment {
                 try {
 
                     return HttpRequest.get(params[0]).accept("application/json").basic("raglar","password1234").body();
+
                 }catch (Exception e){
                     return "";
                 }

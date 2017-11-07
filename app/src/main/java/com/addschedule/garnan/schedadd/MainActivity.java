@@ -21,6 +21,8 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import br.com.simplepass.loading_button_lib.customViews.CircularProgressButton;
 
@@ -31,8 +33,10 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<User> users;
 
     EditText user;
+    EditText password;
 
-    public final static String FILE_ACTIVITIES_SCHEDULE = "schedules.xml";
+    public final static String FILE_ACTIVITIES_SCHEDULE = "schedules.xml",
+    JSON_DATA = "application/json";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,8 +44,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         user = (EditText) findViewById(R.id.mailText);
+        password = (EditText) findViewById(R.id.PasswordID);
 
         new GetUsers().execute("https://schedadd-api.herokuapp.com/users/");
+
+
 
         login = (CircularProgressButton) findViewById(R.id.Login);
 
@@ -49,6 +56,12 @@ public class MainActivity extends AppCompatActivity {
 
     public void setLogin(View view)
     {
+        String username = user.getText().toString(),pass = password.getText().toString();
+
+        System.out.println(username+" "+pass);
+
+        new GetToken().execute("https://schedadd-api.herokuapp.com/get-token/",username,pass);
+
         AsyncTask<String,String,String> demo = new AsyncTask<String, String, String>() {
 
             int index;
@@ -61,6 +74,8 @@ public class MainActivity extends AppCompatActivity {
                 catch (Exception e){
                     e.printStackTrace();
                 }*/
+
+
 
                 String comp = user.getText().toString();
                 String finale = "notdone";
@@ -97,6 +112,26 @@ public class MainActivity extends AppCompatActivity {
         };
 
         demo.execute();
+    }
+
+
+    private class GetToken extends AsyncTask<String,Void,String>{
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            Map<String,String> data = new HashMap<>();
+
+            data.put("username",params[1]);
+            data.put("password",params[2]);
+
+           return HttpRequest.post(params[0]).form(data).body();
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            System.out.println(result);
+        }
     }
 
     private class GetUsers extends AsyncTask<String,Void,String>{
