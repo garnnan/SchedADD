@@ -71,10 +71,12 @@ public class Dialog_activity extends DialogFragment {
 
             Map<String,Integer> call = new HashMap<>();
 
+            System.out.println(params[1]);
+
             call.put("activityID",Integer.parseInt(params[1]));
             call.put("sonID",Integer.parseInt(params[2]));
 
-            return HttpRequest.post(params[0]).form(call).body();
+            return HttpRequest.post(params[0]).basic("raglar","password1234").form(call).body();
         }
 
         @Override
