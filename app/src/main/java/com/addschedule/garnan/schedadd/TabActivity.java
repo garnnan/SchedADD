@@ -48,6 +48,7 @@ public class TabActivity extends AppCompatActivity {
 
     private int index_id;
     private String username;
+    private String password;
     private int sons[];
 
     @Override
@@ -68,6 +69,7 @@ public class TabActivity extends AppCompatActivity {
 
         index_id = getIntent().getIntExtra("id",0);
         username = getIntent().getStringExtra("username");
+        password = getIntent().getStringExtra("password");
         sons = getIntent().getIntArrayExtra("sons");
 
         int [] iconos = new int[]{R.drawable.ic_accessibility_black_24dp,R.drawable.ic_event_note_black_24dp,R.drawable.profile_image};

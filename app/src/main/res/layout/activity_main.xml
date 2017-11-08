@@ -22,7 +22,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginBottom="250dp"
         android:layout_marginTop="275dp"
-        android:hint="E-mail" />
+        android:hint="Username" />
 
     <EditText
         android:layout_width="0dp"
