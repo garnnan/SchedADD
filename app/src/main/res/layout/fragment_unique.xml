@@ -1,13 +1,99 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.addschedule.garnan.schedadd.UniqueActivity">
 
     <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/ninia"
+                android:id="@+id/imageView4" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:gravity="center_horizontal"
+                android:layout_height="match_parent">
+
+                <android.support.design.widget.FloatingActionButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    app:fabSize="mini"
+                    android:layout_marginRight="100dp"
+                    app:srcCompat="@android:drawable/ic_delete"
+                    android:id="@+id/Cancel"
+                    android:layout_weight="1" />
+
+                <android.support.design.widget.FloatingActionButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    app:fabSize="normal"
+                    app:srcCompat="@android:drawable/ic_lock_idle_low_battery"
+                    android:id="@+id/Panic"
+                    android:layout_weight="1"
+                    app:backgroundTint="?android:attr/colorPressedHighlight" />
+
+                <android.support.design.widget.FloatingActionButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    app:fabSize="mini"
+                    android:layout_marginLeft="100dp"
+                    app:srcCompat="@android:drawable/ic_input_add"
+                    android:id="@+id/Done"
+                    android:layout_weight="1"
+                    app:backgroundTint="@android:color/holo_green_dark" />
+
+            </LinearLayout>
+
+            <TextView
+                android:text="Nombre: "
+                android:layout_width="match_parent"
+                android:layout_marginTop="20dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/ActivityName"
+                android:layout_weight="1"
+                android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+
+            <TextView
+                android:text="Descripcion:"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:id="@+id/ActivityDescription"
+                android:textAppearance="@style/TextAppearance.AppCompat.SearchResult.Title" />
+
+            <TextView
+                android:text="TextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:id="@+id/textView7"
+                android:textAppearance="@android:style/TextAppearance.Widget.TextView.SpinnerItem" />
+
+            <TextView
+                android:text="Pasos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/ActivitySteps"
+                android:layout_marginTop="20dp"
+                android:textAppearance="@android:style/TextAppearance.Widget.TextView.SpinnerItem" />
+
+        </LinearLayout>
+    </ScrollView>
 </FrameLayout>
