@@ -216,7 +216,7 @@ public class MainActivity extends AppCompatActivity {
 
                         @Override
                         protected void onPostExecute(String s) {
-                            System.out.println(s);
+                            //System.out.println(s);
                             System.out.println(user.getText().toString());
                             if(s.equals("done")){
 
@@ -234,7 +234,7 @@ public class MainActivity extends AppCompatActivity {
                                 i.putExtra("password",password.getText().toString());
                                 i.putExtra("sons",u.getSons());
                                 startActivity(i);
-                                //finish();
+                                finish();
                             }
                             if(s.equals("notdone")){
                                 login.stopAnimation();
