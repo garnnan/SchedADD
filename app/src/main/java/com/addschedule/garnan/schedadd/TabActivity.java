@@ -64,7 +64,7 @@ public class TabActivity extends AppCompatActivity {
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-         tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
         index_id = getIntent().getIntExtra("id",0);
@@ -169,7 +169,7 @@ public class TabActivity extends AppCompatActivity {
             switch (position)
             {
                 case 0:
-                    return ChildSelector.newInstance(index_id,sons);
+                    return ChildSelector.newInstance(index_id,sons,username,password);
                 case 1:
                     return Actividades.newInstance();
                 case 2:
