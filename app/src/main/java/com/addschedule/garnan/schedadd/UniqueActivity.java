@@ -160,63 +160,69 @@ public class UniqueActivity extends Fragment {
             return HttpRequest.get(params[0]).basic(params[1],params[2]).body();
         }
 
+
+        private JSONObject Activo(JSONArray jsonArray) throws JSONException {
+            for (int i=0;i<jsonArray.length();i++)
+                if(jsonArray.getJSONObject(i).getString("state").equalsIgnoreCase("Activo"))
+                    return jsonArray.getJSONObject(i);
+            return null;
+        }
+
         @Override
         protected void onPostExecute(String s) {
             try {
                 final JSONArray jsonArray = new JSONArray(s);
 
-                final JSONObject jsonObject = jsonArray.getJSONObject(0);
+                final JSONObject jsonObject = Activo(jsonArray);
 
-                TextView name = (TextView) v.findViewById(R.id.ActivityName);
+                if(jsonObject!=null) {
 
-                name.append(jsonObject.getString("name"));
+                    TextView name = (TextView) v.findViewById(R.id.ActivityName);
 
-                TextView description = (TextView) v.findViewById(R.id.Description2);
+                    name.append(jsonObject.getString("name"));
 
-                description.setText(jsonObject.getString("description"));
+                    TextView description = (TextView) v.findViewById(R.id.Description2);
 
-                String st = jsonObject.getString("steps").replace(";","\n");
+                    description.setText(jsonObject.getString("description"));
 
-                TextView steps = (TextView) v.findViewById(R.id.ActivitySteps);
+                    String st = jsonObject.getString("steps").replace(";", "\n");
 
-                steps.setText(st);
+                    TextView steps = (TextView) v.findViewById(R.id.ActivitySteps);
 
-                Button panic = (Button) v.findViewById(R.id.PanicActivity);
+                    steps.setText(st);
 
-                panic.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        try {
-                            new PanicCall().execute("https://schedadd-api.herokuapp.com/panicbuttoncalls/",
-                                    ppt.getProperty("username"),ppt.getProperty("password"),
-                                    String.valueOf(jsonObject.getInt("id")),ppt.getProperty("id_son"));
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+                    Button panic = (Button) v.findViewById(R.id.PanicActivity);
 
-                        Intent intent = new Intent(Intent.ACTION_CALL);
-                        intent.setData(Uri.parse("tel:"+ppt.getProperty("cel")));
-                        //startActivity(intent);
-
-                        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-                                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CALL_PHONE},1);
+                    panic.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            try {
+                                new PanicCall().execute("https://schedadd-api.herokuapp.com/panicbuttoncalls/",
+                                        ppt.getProperty("username"), ppt.getProperty("password"),
+                                        String.valueOf(jsonObject.getInt("id")), ppt.getProperty("id_son"));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
-                            else
-                            {
+
+                            Intent intent = new Intent(Intent.ACTION_CALL);
+                            intent.setData(Uri.parse("tel:" + ppt.getProperty("cel")));
+                            //startActivity(intent);
+
+                            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CALL_PHONE}, 1);
+                                } else {
+                                    startActivity(intent);
+                                }
+                            } else {
                                 startActivity(intent);
                             }
                         }
-                        else
-                        {
-                            startActivity(intent);
-                        }
-                    }
-                });
+                    });
 
 
-                new LoadImage((ImageView) v.findViewById(R.id.ActivityImage)).execute(jsonObject.getString("imagePath"));
-
+                    new LoadImage((ImageView) v.findViewById(R.id.ActivityImage)).execute(jsonObject.getString("imagePath"));
+                }
 
             } catch (JSONException e) {
                 e.printStackTrace();
