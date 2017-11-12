@@ -64,7 +64,7 @@ public class TabActivity extends AppCompatActivity {
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-         tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
         index_id = getIntent().getIntExtra("id",0);
@@ -72,7 +72,7 @@ public class TabActivity extends AppCompatActivity {
         password = getIntent().getStringExtra("password");
         sons = getIntent().getIntArrayExtra("sons");
 
-        int [] iconos = new int[]{R.drawable.ic_accessibility_black_24dp,R.drawable.ic_event_note_black_24dp,R.drawable.profile_image};
+        int [] iconos = new int[]{R.drawable.ic_accessibility_black_24dp,R.drawable.ic_event_note_black_24dp,R.drawable.profile_image,R.drawable.ic_settings_black_24dp};
 
         //tabLayout.getTabAt(1).setIcon(R.drawable.ic_event_note_black_24dp);
 
@@ -169,11 +169,13 @@ public class TabActivity extends AppCompatActivity {
             switch (position)
             {
                 case 0:
-                    return ChildSelector.newInstance(index_id,sons);
+                    return ChildSelector.newInstance(index_id,sons,username,password);
                 case 1:
                     return Actividades.newInstance();
                 case 2:
                     return AvatarSelector.newInstance();
+                case 3:
+                    return Preferences.newInstance();
                 default:
                     return PlaceholderFragment.newInstance(position + 1);
             }
@@ -196,6 +198,8 @@ public class TabActivity extends AppCompatActivity {
                     return "Activities";
                 case 2:
                     return "Profile";
+                case 3:
+                    return "Preferences";
             }
             return null;
         }

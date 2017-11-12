@@ -53,6 +53,8 @@ public class ChildSelector extends Fragment {
 
     private int id;
     private int [] sons;
+    private String user;
+    private String pass;
     private ArrayList<Schedules> schedules;
     private Properties ppt;
 
@@ -63,11 +65,13 @@ public class ChildSelector extends Fragment {
      * @return A new instance of fragment ChildSelector.
      */
     // TODO: Rename and change types and number of parameters
-    public static ChildSelector newInstance(int id,int [] sons) {
+    public static ChildSelector newInstance(int id,int [] sons,String user,String pass) {
         ChildSelector fragment = new ChildSelector();
         Bundle args = new Bundle();
         args.putInt("id",id);
         args.putIntArray("sons",sons);
+        args.putString("user",user);
+        args.putString("pass",pass);
         fragment.setArguments(args);
         return fragment;
     }
@@ -79,6 +83,11 @@ public class ChildSelector extends Fragment {
 
         this.id = getArguments().getInt("id");
         this.sons = getArguments().getIntArray("sons");
+
+        this.user = getArguments().getString("user");
+        this.pass = getArguments().getString("pass");
+
+        System.out.println("usuario es "+user);
 
         this.ppt = new Properties();
 
@@ -100,7 +109,7 @@ public class ChildSelector extends Fragment {
 
                 try {
 
-                    return HttpRequest.get(params[0]).accept("application/json").basic("raglar","password1234").body();
+                    return HttpRequest.get(params[0]).accept("application/json").basic(user,pass).body();
                 }catch (Exception e){
                     return "";
                 }

@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
     {
         String username = user.getText().toString(),pass = password.getText().toString();
 
-        System.out.println(username+" "+pass);
+        //System.out.println(username+" "+pass);
 
         new GetUsers().execute("https://schedadd-api.herokuapp.com/users/",username,pass);
 
@@ -184,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
                         ,jsonObject.getString("first_name"),jsonObject.getString("last_name")
                         ,jsonObject.getString("email"),sons));
 
-                        System.out.println(users.get(i).getId());
+                        //System.out.println(users.get(i).getId());
                     }
 
                     //System.out.println(users.get(0).getFirst_name());
@@ -216,7 +216,8 @@ public class MainActivity extends AppCompatActivity {
 
                         @Override
                         protected void onPostExecute(String s) {
-                            System.out.println(s);
+                            //System.out.println(s);
+                            System.out.println(user.getText().toString());
                             if(s.equals("done")){
 
                                 new GetToken().execute("https://schedadd-api.herokuapp.com/get-token/",user.getText().toString(),password.getText().toString());
@@ -224,6 +225,8 @@ public class MainActivity extends AppCompatActivity {
                                 login.startAnimation();
 
                                 User u = users.get(index);
+
+
 
                                 Intent i = new Intent(MainActivity.this,TabActivity.class);
                                 i.putExtra("id",u.getId());

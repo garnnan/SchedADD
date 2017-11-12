@@ -1,0 +1,100 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.addschedule.garnan.schedadd.UniqueActivity">
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical" >
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/perro"
+                android:id="@+id/imageView4" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:gravity="center_horizontal"
+                android:layout_marginTop="20dp"
+                android:layout_height="match_parent">
+
+                <android.support.design.widget.FloatingActionButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    app:fabSize="normal"
+                    android:layout_marginRight="50dp"
+                    app:srcCompat="@android:drawable/ic_delete"
+                    android:id="@+id/Cancel"
+                    android:layout_weight="1" />
+
+                <android.support.design.widget.FloatingActionButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    app:fabSize="normal"
+                    android:layout_marginLeft="50dp"
+                    app:srcCompat="@android:drawable/ic_input_add"
+                    android:id="@+id/Done"
+                    android:layout_weight="1"
+                    app:backgroundTint="@android:color/holo_green_dark" />
+
+            </LinearLayout>
+
+            <TextView
+                android:text="Nombre: "
+                android:layout_width="match_parent"
+                android:layout_marginTop="20dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/ActivityName"
+                android:layout_weight="1"
+                android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+
+            <TextView
+                android:text="Descripcion:"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:id="@+id/ActivityDescription"
+                android:textAppearance="@style/TextAppearance.AppCompat.SearchResult.Title" />
+
+            <TextView
+                android:text="TextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:id="@+id/Description2"
+                android:textAppearance="@android:style/TextAppearance.Widget.TextView.SpinnerItem" />
+
+            <TextView
+                android:text="Pasos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/ActivitySteps"
+                android:layout_marginTop="20dp"
+                android:textAppearance="@android:style/TextAppearance.Widget.TextView.SpinnerItem" />
+
+            <Button
+                android:text="Panic"
+                android:layout_width="100dp"
+                android:layout_marginTop="50dp"
+                android:id="@+id/PanicActivity"
+                android:background="@drawable/round_button"
+                android:layout_weight="0.19"
+                android:layout_height="100dp" />
+
+        </LinearLayout>
+    </ScrollView>
+</FrameLayout>
