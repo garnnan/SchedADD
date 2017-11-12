@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.addschedule.garnan.schedadd.Api.Clases.Son;
 import com.addschedule.garnan.schedadd.Api.Clases.User;
 import com.github.kevinsawicki.http.HttpRequest;
 
@@ -27,6 +28,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.InvalidPropertiesFormatException;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -40,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
 
     EditText user;
     EditText password;
+
+    List<Son> sons;
 
     Properties ppt;
 
@@ -183,7 +187,7 @@ public class MainActivity extends AppCompatActivity {
                 //Toast.makeText(MainActivity.this,AdUser.getSons()[0]+" ",Toast.LENGTH_LONG).show();
 
 
-
+                new GetSons().execute("https://schedadd-api.herokuapp.com/sons/",id,user,pass);
 
             } catch (JSONException e) {
                 //e.printStackTrace();
@@ -196,14 +200,45 @@ public class MainActivity extends AppCompatActivity {
 
     private class GetSons extends AsyncTask<String,Void,String>
     {
+
+        private String id,user,pass;
+
         @Override
         protected String doInBackground(String... params) {
-            return null;
+            id = params[1];
+            user = params[2];
+            pass = params[3];
+            return HttpRequest.get(params[0]).basic(user,pass).body();
         }
 
         @Override
         protected void onPostExecute(String s) {
-            super.onPostExecute(s);
+            //Toast.makeText(MainActivity.this,s,Toast.LENGTH_LONG).show();
+            sons = new ArrayList<>();
+
+            try {
+                JSONArray jsonArray = new JSONArray(s);
+
+                for (int i=0;i<jsonArray.length();i++){
+
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+                    int sche [] = new int[jsonObject.getJSONArray("schedules").length()];
+
+                    for (int j=0;j<sche.length;j++)
+                        sche[j] = jsonObject.getJSONArray("schedules").getInt(j);
+
+                    sons.add(new Son(jsonObject.getInt("id"),jsonObject.getString("name"),jsonObject.getString("lastName"),
+                            jsonObject.getString("birthday"),jsonObject.getString("gender"),jsonObject.getString("code"),
+                            jsonObject.getString("cellphone"),jsonObject.getInt("parentID"),sche));
+
+                    //Toast.makeText(MainActivity.this,sons.get(i).getCode(),Toast.LENGTH_LONG).show();
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
         }
     }
 }
