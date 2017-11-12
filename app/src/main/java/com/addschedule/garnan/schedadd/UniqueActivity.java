@@ -4,8 +4,6 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -26,9 +24,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.InputStream;
-import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -92,7 +92,7 @@ public class UniqueActivity extends Fragment {
         new GetActivity(v).execute("https://schedadd-api.herokuapp.com/activities/",
                 ppt.getProperty("username"),ppt.getProperty("password"));
 
-        //new LoadImage((ImageView) v.findViewById(R.id.ActivityImage)).execute("http://papasabordo.com/Portal/papas-a-bordo/uploads/2015/03/consejos-tareas-1728x800_c.jpg");
+        //new LoadImages((ImageView) v.findViewById(R.id.ActivityImage)).execute("http://papasabordo.com/Portal/papas-a-bordo/uploads/2015/03/consejos-tareas-1728x800_c.jpg");
 
         return v;
     }
@@ -160,63 +160,91 @@ public class UniqueActivity extends Fragment {
             return HttpRequest.get(params[0]).basic(params[1],params[2]).body();
         }
 
+
+        private JSONObject Activo(JSONArray jsonArray) throws JSONException {
+            for (int i=0;i<jsonArray.length();i++)
+                if(jsonArray.getJSONObject(i).getString("state").equalsIgnoreCase("Activo"))
+                    return jsonArray.getJSONObject(i);
+            return null;
+        }
+
         @Override
         protected void onPostExecute(String s) {
             try {
                 final JSONArray jsonArray = new JSONArray(s);
 
-                final JSONObject jsonObject = jsonArray.getJSONObject(0);
+                List<JSONObject> lista = new ArrayList<>();
 
-                TextView name = (TextView) v.findViewById(R.id.ActivityName);
+                for (int i=0;i<jsonArray.length();i++)
+                {
+                    lista.add(jsonArray.getJSONObject(i));
+                }
 
-                name.append(jsonObject.getString("name"));
-
-                TextView description = (TextView) v.findViewById(R.id.Description2);
-
-                description.setText(jsonObject.getString("description"));
-
-                String st = jsonObject.getString("steps").replace(";","\n");
-
-                TextView steps = (TextView) v.findViewById(R.id.ActivitySteps);
-
-                steps.setText(st);
-
-                Button panic = (Button) v.findViewById(R.id.PanicActivity);
-
-                panic.setOnClickListener(new View.OnClickListener() {
+                Collections.sort(lista, new Comparator<JSONObject>() {
                     @Override
-                    public void onClick(View v) {
+                    public int compare(JSONObject o1, JSONObject o2) {
                         try {
-                            new PanicCall().execute("https://schedadd-api.herokuapp.com/panicbuttoncalls/",
-                                    ppt.getProperty("username"),ppt.getProperty("password"),
-                                    String.valueOf(jsonObject.getInt("id")),ppt.getProperty("id_son"));
+                            return o1.getString("date").compareTo(o2.getString("date"));
                         } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
-                        Intent intent = new Intent(Intent.ACTION_CALL);
-                        intent.setData(Uri.parse("tel:"+ppt.getProperty("cel")));
-                        //startActivity(intent);
-
-                        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-                                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CALL_PHONE},1);
-                            }
-                            else
-                            {
-                                startActivity(intent);
-                            }
-                        }
-                        else
-                        {
-                            startActivity(intent);
+                            return 0;
                         }
                     }
                 });
 
+                for (int i=0;i<lista.size();i++)
+                    jsonArray.put(i,lista.get(i));
 
-                new LoadImage((ImageView) v.findViewById(R.id.ActivityImage)).execute(jsonObject.getString("imagePath"));
 
+                final JSONObject jsonObject = Activo(jsonArray);
+
+                if(jsonObject!=null) {
+
+                    TextView name = (TextView) v.findViewById(R.id.ActivityName);
+
+                    name.append(jsonObject.getString("name"));
+
+                    TextView description = (TextView) v.findViewById(R.id.Description2);
+
+                    description.setText(jsonObject.getString("description"));
+
+                    String st = jsonObject.getString("steps").replace(";", "\n");
+
+                    TextView steps = (TextView) v.findViewById(R.id.ActivitySteps);
+
+                    steps.setText(st);
+
+                    Button panic = (Button) v.findViewById(R.id.PanicActivity);
+
+                    panic.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            try {
+                                new PanicCall().execute("https://schedadd-api.herokuapp.com/panicbuttoncalls/",
+                                        ppt.getProperty("username"), ppt.getProperty("password"),
+                                        String.valueOf(jsonObject.getInt("id")), ppt.getProperty("id_son"));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                            Intent intent = new Intent(Intent.ACTION_CALL);
+                            intent.setData(Uri.parse("tel:" + ppt.getProperty("cel")));
+                            //startActivity(intent);
+
+                            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CALL_PHONE}, 1);
+                                } else {
+                                    startActivity(intent);
+                                }
+                            } else {
+                                startActivity(intent);
+                            }
+                        }
+                    });
+
+
+                    new LoadImages((ImageView) v.findViewById(R.id.ActivityImage)).execute(jsonObject.getString("imagePath"));
+                }
 
             } catch (JSONException e) {
                 e.printStackTrace();
