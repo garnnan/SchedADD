@@ -250,8 +250,13 @@ public class MainActivity extends AppCompatActivity {
                             ppt.put("schedules",s.getSchedules()[0]+"");
                             ppt.put("cel",s.getCellphone()+"");
                             ppt.put("name",s.getName()+"");
+                            ppt.put("gender",s.getGender());
                             ppt.put("lastname",s.getLastName());
                             ppt.put("birth",s.getBithday()+"");
+
+                            ppt.put("username",user);
+                            ppt.put("password",pass);
+
 
                             //Toast.makeText(MainActivity.this,ppt.toString(),Toast.LENGTH_SHORT).show();
 

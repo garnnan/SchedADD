@@ -1,6 +1,7 @@
 package com.addschedule.garnan.schedadd;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.support.design.widget.TabLayout;
@@ -25,7 +26,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.addschedule.garnan.schedadd.Api.Clases.Son;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.InvalidPropertiesFormatException;
 import java.util.Properties;
 
 public class TabActivity extends AppCompatActivity {
@@ -56,6 +64,7 @@ public class TabActivity extends AppCompatActivity {
 
     Properties ppt;
 
+    Son son;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +87,30 @@ public class TabActivity extends AppCompatActivity {
         password = getIntent().getStringExtra("password");
         sons = getIntent().getIntArrayExtra("sons");*/
 
+        ppt = new Properties();
+
+        try {
+
+            FileInputStream fi = openFileInput(MainActivity.TOKENS);
+            ppt.loadFromXML(fi);
+            fi.close();
+
+            if(!ppt.getProperty("id").equals(""))
+            {
+                //Toast.makeText(TabActivity.this,ppt.toString(),Toast.LENGTH_LONG).show();
+                son = new Son(Integer.parseInt(ppt.getProperty("id_son")),ppt.getProperty("name"),
+                        ppt.getProperty("lastname"),ppt.getProperty("birth"),ppt.getProperty("gender"),
+                        ppt.getProperty("code"),ppt.getProperty("cel"),Integer.parseInt(ppt.getProperty("id")),
+                        new int[]{Integer.parseInt(ppt.getProperty("schedules"))});
+            }
+
+        } catch (FileNotFoundException e) {
+            //Toast.makeText(MainActivity.this,"no existe el archivo",Toast.LENGTH_SHORT).show();
+        } catch (InvalidPropertiesFormatException e) {
+            Toast.makeText(TabActivity.this,"las propiedades no salieron",Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            Toast.makeText(TabActivity.this,"error de lectura",Toast.LENGTH_SHORT).show();
+        }
 
 
         int [] iconos = new int[]{R.drawable.ic_accessibility_black_24dp,R.drawable.ic_event_note_black_24dp,R.drawable.profile_image,R.drawable.ic_settings_black_24dp};
@@ -184,6 +217,8 @@ public class TabActivity extends AppCompatActivity {
                     return AvatarSelector.newInstance();
                 case 3:
                     return Preferences.newInstance();*/
+                case 3:
+                    return Preferences.newInstance(ppt);
                 default:
                     return PlaceholderFragment.newInstance(position + 1);
             }

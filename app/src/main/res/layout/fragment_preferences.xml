@@ -6,11 +6,50 @@
 
     <!-- TODO: Update blank fragment layout -->
 
-    <Button
-        android:text="X Log out"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/logout"
-        style="@style/Widget.AppCompat.Button.Colored"
-        android:textAppearance="@style/TextAppearance.AppCompat.Inverse" />
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:orientation="vertical" >
+
+            <TextView
+                android:text="Nombre: "
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/Nombre_Pre"
+                android:layout_marginTop="20dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+
+            <TextView
+                android:text="Cumpleaños: "
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:id="@+id/cumple_pre"
+                android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+
+            <TextView
+                android:text="Genero: "
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/genero_pre"
+                android:layout_marginTop="20dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+
+            <Button
+                android:text="X Log out"
+                android:layout_width="match_parent"
+                android:layout_marginTop="20dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/logout"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:textAppearance="@style/TextAppearance.AppCompat.Inverse" />
+        </LinearLayout>
+    </ScrollView>
+
 </FrameLayout>
