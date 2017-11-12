@@ -17,11 +17,24 @@
             android:gravity="center_horizontal"
             android:orientation="vertical" >
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:srcCompat="@drawable/perro"
-                android:id="@+id/imageView4" />
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    app:srcCompat="@drawable/perro"
+                    android:id="@+id/imageView4" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@drawable/fondocircular"
+                    android:layout_gravity="center_horizontal"
+                    android:id="@+id/imageView6" />
+            </FrameLayout>
 
             <LinearLayout
                 android:orientation="horizontal"
@@ -46,6 +59,7 @@
                     android:clickable="true"
                     app:fabSize="normal"
                     android:layout_marginLeft="50dp"
+                    android:layout_marginBottom="10dp"
                     app:srcCompat="@android:drawable/ic_input_add"
                     android:id="@+id/Done"
                     android:layout_weight="1"
@@ -88,12 +102,13 @@
 
             <Button
                 android:text="Panic"
-                android:layout_width="100dp"
                 android:layout_marginTop="50dp"
                 android:id="@+id/PanicActivity"
+                android:layout_marginBottom="30dp"
                 android:background="@drawable/round_button"
                 android:layout_weight="0.19"
-                android:layout_height="100dp" />
+                android:layout_height="150dp"
+                android:layout_width="150dp" />
 
         </LinearLayout>
     </ScrollView>

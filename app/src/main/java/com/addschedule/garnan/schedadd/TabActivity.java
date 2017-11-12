@@ -217,6 +217,8 @@ public class TabActivity extends AppCompatActivity {
                     return AvatarSelector.newInstance();
                 case 3:
                     return Preferences.newInstance();*/
+                case 0:
+                    return UniqueActivity.newInstance();
                 case 2:
                     return Preferences.newInstance(ppt);
                 default:
