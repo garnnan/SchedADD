@@ -104,7 +104,7 @@ public class Preferences extends Fragment {
                     public void onClick(View v) {
                         if(code.getText().toString().equals(ppt.getProperty("code")))
                         {
-                            ppt.setProperty("id","");
+                            ppt.put("id","");
 
                             try {
                                 FileOutputStream fos = getActivity().openFileOutput(MainActivity.TOKENS,getContext().MODE_PRIVATE);
