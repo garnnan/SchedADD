@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
 
     CircularProgressButton login;
 
-    ArrayList<User> users;
+    User AdUser;
 
     EditText user;
     EditText password;
@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ppt = new Properties();
+        /*ppt = new Properties();
 
         try {
 
@@ -67,12 +67,10 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
 
         user = (EditText) findViewById(R.id.mailText);
         password = (EditText) findViewById(R.id.PasswordID);
-
-
 
         login = (CircularProgressButton) findViewById(R.id.Login);
 
@@ -82,11 +80,9 @@ public class MainActivity extends AppCompatActivity {
     {
         String username = user.getText().toString(),pass = password.getText().toString();
 
-        //System.out.println(username+" "+pass);
+        login.startAnimation();
 
-        new GetUsers().execute("https://schedadd-api.herokuapp.com/users/",username,pass);
-
-
+        new GetToken().execute("https://schedadd-api.herokuapp.com/get-token/",username,pass);
     }
 
 
@@ -111,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result) {
             //System.out.println(result);
-            try {
+            /*try {
 
                 JSONObject jsonObject = new JSONObject();
                 ppt.put("token",jsonObject.getString("token"));
@@ -133,133 +129,81 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this,"Error al guardar sesion",Toast.LENGTH_SHORT).show();
             } catch (IOException e) {
                 e.printStackTrace();
+            }*/
+
+            try {
+                JSONObject jsonObject = new JSONObject(result);
+
+                if(jsonObject.getString("id") != null)
+                    new GetUsers().execute("https://schedadd-api.herokuapp.com/users/",user,pass,jsonObject.getString("id"));
+
+            } catch (JSONException e) {
+                Toast.makeText(MainActivity.this,"error de login",Toast.LENGTH_SHORT).show();
+                login.revertAnimation();
             }
 
 
+            //new GetUsers().execute("https://schedadd-api.herokuapp.com/users/",)
         }
     }
 
     private class GetUsers extends AsyncTask<String,Void,String>{
 
+        private String id,user,pass;
+
         @Override
         protected String doInBackground(String... params) {
 
-            try {
+            user = params[1];
+            pass = params[2];
+            id = params[3];
 
-                return HttpRequest.get(params[0]).accept("application/json").basic(params[1],params[2]).body();
-            }catch (Exception e){
-                return "";
-            }
+            return HttpRequest.get(params[0]).accept("application/json").basic(params[1],params[2]).body();
         }
 
         @Override
         protected void onPostExecute(String result) {
-            if(result.isEmpty())
-            {
-                Toast.makeText(MainActivity.this,"No hay resultados",Toast.LENGTH_LONG);
+
+            //Toast.makeText(MainActivity.this,id+" "+result,Toast.LENGTH_LONG).show();
+
+            try {
+                JSONArray jsonArray = new JSONArray(result);
+
+                JSONObject jsonObject = new JSONObject(jsonArray.get(Integer.parseInt(id)-1).toString());
+
+                int sons [] = new int[jsonObject.getJSONArray("sons").length()];
+
+                for (int i=0;i<sons.length;i++)
+                    sons[i] = jsonObject.getJSONArray("sons").getInt(i);
+
+                AdUser = new User(jsonObject.getInt("id"),jsonObject.getString("username"),
+                        jsonObject.getString("first_name"),
+                        jsonObject.getString("last_name"),jsonObject.getString("email"),sons);
+
+                //Toast.makeText(MainActivity.this,AdUser.getSons()[0]+" ",Toast.LENGTH_LONG).show();
+
+
+
+
+            } catch (JSONException e) {
+                //e.printStackTrace();
+                login.revertAnimation();
             }
-            else
-            {
-                //System.out.println(result);
 
-                try {
-                    JSONArray jsonArray = new JSONArray(result);
-                    users = new ArrayList<>();
+            login.revertAnimation();
+        }
+    }
 
-                    for(int i=0;i<jsonArray.length();i++) {
-                        System.out.println(jsonArray.get(i));
-                        JSONObject jsonObject = jsonArray.getJSONObject(i);
-                        //System.out.println(jsonObject.getString("username"));
+    private class GetSons extends AsyncTask<String,Void,String>
+    {
+        @Override
+        protected String doInBackground(String... params) {
+            return null;
+        }
 
-                        JSONArray subarray = jsonObject.getJSONArray("sons");
-
-                        int [] sons = new int [subarray.length()];
-
-                        for (int j=0;j<subarray.length();j++) {
-                            sons[j] = subarray.getInt(j);
-                            //System.out.println(sons[j]);
-                        }
-
-                        users.add(new User(jsonObject.getInt("id"),jsonObject.getString("username")
-                        ,jsonObject.getString("first_name"),jsonObject.getString("last_name")
-                        ,jsonObject.getString("email"),sons));
-
-                        //System.out.println(users.get(i).getId());
-                    }
-
-                    //System.out.println(users.get(0).getFirst_name());
-
-                    AsyncTask<String,String,String> demo = new AsyncTask<String, String, String>() {
-
-                        int index;
-
-                        @Override
-                        protected String doInBackground(String... params) {
-                /*try{
-                    Thread.sleep(3000);
-                }
-                catch (Exception e){
-                    e.printStackTrace();
-                }*/
-
-                            String comp = user.getText().toString();
-                            String finale = "notdone";
-
-                            for (int i=0;i<users.size();i++)
-                                if(users.get(i).getUsername().equals(comp)) {
-                                    finale = "done";
-                                    index = i;
-                                }
-
-                            return finale;
-                        }
-
-                        @Override
-                        protected void onPostExecute(String s) {
-                            //System.out.println(s);
-                            System.out.println(user.getText().toString());
-                            if(s.equals("done")){
-
-                                new GetToken().execute("https://schedadd-api.herokuapp.com/get-token/",user.getText().toString(),password.getText().toString());
-
-                                login.startAnimation();
-
-                                User u = users.get(index);
-
-
-
-                                Intent i = new Intent(MainActivity.this,TabActivity.class);
-                                i.putExtra("id",u.getId());
-                                i.putExtra("username",u.getUsername());
-                                i.putExtra("password",password.getText().toString());
-                                i.putExtra("sons",u.getSons());
-                                startActivity(i);
-                                finish();
-                            }
-                            if(s.equals("notdone")){
-                                login.stopAnimation();
-                                Toast.makeText(MainActivity.this,"Login incorrecto",Toast.LENGTH_LONG).show();
-                            }
-                        }
-                    };
-
-                    demo.execute();
-
-                } catch (JSONException e) {
-                    //e.printStackTrace();
-                    Toast.makeText(MainActivity.this,"Error en login",Toast.LENGTH_LONG);
-                }
-
-
-
-
-                /*ArrayList<User> Users = User.Users(result);
-                ArrayList<User> AUX = new ArrayList<>();
-
-                for (User u: Users) {
-                    System.out.println(u);
-                }*/
-            }
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
         }
     }
 }

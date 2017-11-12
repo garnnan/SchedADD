@@ -168,14 +168,14 @@ public class TabActivity extends AppCompatActivity {
 
             switch (position)
             {
-                case 0:
+                /*case 0:
                     return ChildSelector.newInstance(index_id,sons,username,password);
                 case 1:
                     return Actividades.newInstance();
                 case 2:
                     return AvatarSelector.newInstance();
                 case 3:
-                    return Preferences.newInstance();
+                    return Preferences.newInstance();*/
                 default:
                     return PlaceholderFragment.newInstance(position + 1);
             }
