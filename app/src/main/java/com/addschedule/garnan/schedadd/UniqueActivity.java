@@ -1,12 +1,19 @@
 package com.addschedule.garnan.schedadd;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+
+import java.io.InputStream;
+import java.net.URL;
 
 
 /**
@@ -27,6 +34,8 @@ public class UniqueActivity extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    private ImageView imagenActividad;
+
     private OnFragmentInteractionListener mListener;
 
     public UniqueActivity() {
@@ -37,8 +46,6 @@ public class UniqueActivity extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
      * @return A new instance of fragment UniqueActivity.
      */
     // TODO: Rename and change types and number of parameters
@@ -58,7 +65,11 @@ public class UniqueActivity extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_unique, container, false);
+        View v = inflater.inflate(R.layout.fragment_unique, container, false);
+
+        new LoadImage((ImageView) v.findViewById(R.id.ActivityImage)).execute("http://papasabordo.com/Portal/papas-a-bordo/uploads/2015/03/consejos-tareas-1728x800_c.jpg");
+
+        return v;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -99,4 +110,36 @@ public class UniqueActivity extends Fragment {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
+
+    private class LoadImage extends AsyncTask<String,Void,Bitmap>
+    {
+
+        ImageView bmImageView;
+
+        public LoadImage(ImageView bmImageView)
+        {
+            this.bmImageView = bmImageView;
+        }
+
+        @Override
+        protected Bitmap doInBackground(String... params) {
+            Bitmap icon = null;
+            try{
+                InputStream in = new URL(params[0]).openStream();
+                icon = BitmapFactory.decodeStream(in);
+            }
+            catch (Exception e)
+            {
+
+            }
+
+            return icon;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            bmImageView.setImageBitmap(bitmap);
+        }
+    }
+
 }
