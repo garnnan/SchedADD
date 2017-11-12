@@ -218,7 +218,7 @@ public class TabActivity extends AppCompatActivity {
                 case 3:
                     return Preferences.newInstance();*/
                 case 0:
-                    return UniqueActivity.newInstance();
+                    return UniqueActivity.newInstance(ppt);
                 case 2:
                     return Preferences.newInstance(ppt);
                 default:
