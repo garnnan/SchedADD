@@ -27,6 +27,7 @@
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:gravity="center_horizontal"
+                android:layout_marginTop="20dp"
                 android:layout_height="match_parent">
 
                 <android.support.design.widget.FloatingActionButton
@@ -74,7 +75,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:id="@+id/textView7"
+                android:id="@+id/Description2"
                 android:textAppearance="@android:style/TextAppearance.Widget.TextView.SpinnerItem" />
 
             <TextView
@@ -84,6 +85,15 @@
                 android:id="@+id/ActivitySteps"
                 android:layout_marginTop="20dp"
                 android:textAppearance="@android:style/TextAppearance.Widget.TextView.SpinnerItem" />
+
+            <Button
+                android:text="Panic"
+                android:layout_width="100dp"
+                android:layout_marginTop="50dp"
+                android:id="@+id/PanicActivity"
+                android:background="@drawable/round_button"
+                android:layout_weight="0.19"
+                android:layout_height="100dp" />
 
         </LinearLayout>
     </ScrollView>
