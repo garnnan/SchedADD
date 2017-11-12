@@ -224,36 +224,7 @@ public class UniqueActivity extends Fragment {
         }
     }
 
-    private class LoadImage extends AsyncTask<String,Void,Bitmap>
-    {
 
-        ImageView bmImageView;
-
-        public LoadImage(ImageView bmImageView)
-        {
-            this.bmImageView = bmImageView;
-        }
-
-        @Override
-        protected Bitmap doInBackground(String... params) {
-            Bitmap icon = null;
-            try{
-                InputStream in = new URL(params[0]).openStream();
-                icon = BitmapFactory.decodeStream(in);
-            }
-            catch (Exception e)
-            {
-
-            }
-
-            return icon;
-        }
-
-        @Override
-        protected void onPostExecute(Bitmap bitmap) {
-            bmImageView.setImageBitmap(bitmap);
-        }
-    }
 
     private class PanicCall extends AsyncTask<String,Void,String>
     {

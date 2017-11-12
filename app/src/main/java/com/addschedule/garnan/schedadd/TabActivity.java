@@ -219,6 +219,8 @@ public class TabActivity extends AppCompatActivity {
                     return Preferences.newInstance();*/
                 case 0:
                     return UniqueActivity.newInstance(ppt);
+                case 1:
+                    return ListaActividades.newInstance(ppt);
                 case 2:
                     return Preferences.newInstance(ppt);
                 default:
@@ -242,7 +244,7 @@ public class TabActivity extends AppCompatActivity {
                 case 1:
                     return "ListaActividades";
                 case 2:
-                    return "Preferences";
+                    return "Preferencias";
             }
             return null;
         }
