@@ -4,10 +4,12 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import android.widget.VideoView;
@@ -87,6 +89,16 @@ public class MainActivity extends AppCompatActivity {
         login.startAnimation();
 
         new GetToken().execute("https://schedadd-api.herokuapp.com/get-token/",username,pass);
+
+
+    }
+
+    private int BuscarChild(String code)
+    {
+        for (int i=0;i<sons.size();i++)
+            if(sons.get(i).getCode().equals(code))
+                return i;
+        return -1;
     }
 
 
@@ -184,8 +196,6 @@ public class MainActivity extends AppCompatActivity {
                         jsonObject.getString("first_name"),
                         jsonObject.getString("last_name"),jsonObject.getString("email"),sons);
 
-                //Toast.makeText(MainActivity.this,AdUser.getSons()[0]+" ",Toast.LENGTH_LONG).show();
-
 
                 new GetSons().execute("https://schedadd-api.herokuapp.com/sons/",id,user,pass);
 
@@ -194,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
                 login.revertAnimation();
             }
 
-            login.revertAnimation();
+
         }
     }
 
@@ -213,7 +223,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String s) {
-            //Toast.makeText(MainActivity.this,s,Toast.LENGTH_LONG).show();
+
             sons = new ArrayList<>();
 
             try {
@@ -232,11 +242,40 @@ public class MainActivity extends AppCompatActivity {
                             jsonObject.getString("birthday"),jsonObject.getString("gender"),jsonObject.getString("code"),
                             jsonObject.getString("cellphone"),jsonObject.getInt("parentID"),sche));
 
-                    //Toast.makeText(MainActivity.this,sons.get(i).getCode(),Toast.LENGTH_LONG).show();
                 }
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+
+                View v = getLayoutInflater().inflate(R.layout.codeinput,null);
+
+                final EditText code = (EditText) v.findViewById(R.id.codeInput);
+
+                Button accp = (Button) v.findViewById(R.id.LogCode);
+
+                accp.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int codex = BuscarChild(code.getText().toString());
+                        if(codex!=-1)
+                        {
+                            //Toast.makeText(MainActivity.this,"se concecto con exito",Toast.LENGTH_SHORT).show();
+
+                        }
+                        else
+                            Toast.makeText(MainActivity.this,"error con el codigo",Toast.LENGTH_LONG).show();
+                    }
+                });
+
+                builder.setView(v);
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
+
+                login.revertAnimation();
+
 
             } catch (JSONException e) {
                 e.printStackTrace();
+                login.revertAnimation();
             }
 
         }
