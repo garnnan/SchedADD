@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,17 +13,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.addschedule.garnan.schedadd.Api.Clases.Activity;
 import com.github.kevinsawicki.http.HttpRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Properties;
 
@@ -85,6 +85,15 @@ public class ListaActividades extends Fragment {
         return v;
     }
 
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if(isVisibleToUser) {
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.detach(this).attach(this).commit();
+        }
+    }
+
     private class GetActivities extends AsyncTask<String,Void,String>
     {
 
@@ -117,6 +126,14 @@ public class ListaActividades extends Fragment {
 
 
                 //System.out.println(objects.get(0).getImage());
+
+                Collections.sort(objects, new Comparator<Activity>() {
+                    @Override
+                    public int compare(Activity o1, Activity o2) {
+                        return o1.getDate().compareTo(o2.getDate());
+                    }
+                });
+
 
                 RecyclerView recyclerView = (RecyclerView) v.findViewById(R.id.ListadoActividades);
 
@@ -156,7 +173,7 @@ public class ListaActividades extends Fragment {
             holder.name.setText(list.get(position).getName());
             //holder.imagepath = list.get(position).getImage();
 
-            new LoadImage((ImageView) holder.itemView.findViewById(R.id.ImagenActividadLista)).execute(list.get(position).getImage());
+            new LoadImages((ImageView) holder.itemView.findViewById(R.id.ImagenActividadLista)).execute(list.get(position).getImage());
         }
 
         @Override
@@ -174,7 +191,7 @@ public class ListaActividades extends Fragment {
             public ViewHolder(View itemView) {
                 super(itemView);
                 name = (TextView) itemView.findViewById(R.id.nombreActividadListada);
-                //new LoadImage((ImageView) itemView.findViewById(R.id.ImagenActividadLista)).execute(imagepath);
+                //new LoadImages((ImageView) itemView.findViewById(R.id.ImagenActividadLista)).execute(imagepath);
             }
 
 

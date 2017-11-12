@@ -4,8 +4,6 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -26,9 +24,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.InputStream;
-import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -92,7 +92,7 @@ public class UniqueActivity extends Fragment {
         new GetActivity(v).execute("https://schedadd-api.herokuapp.com/activities/",
                 ppt.getProperty("username"),ppt.getProperty("password"));
 
-        //new LoadImage((ImageView) v.findViewById(R.id.ActivityImage)).execute("http://papasabordo.com/Portal/papas-a-bordo/uploads/2015/03/consejos-tareas-1728x800_c.jpg");
+        //new LoadImages((ImageView) v.findViewById(R.id.ActivityImage)).execute("http://papasabordo.com/Portal/papas-a-bordo/uploads/2015/03/consejos-tareas-1728x800_c.jpg");
 
         return v;
     }
@@ -173,6 +173,28 @@ public class UniqueActivity extends Fragment {
             try {
                 final JSONArray jsonArray = new JSONArray(s);
 
+                List<JSONObject> lista = new ArrayList<>();
+
+                for (int i=0;i<jsonArray.length();i++)
+                {
+                    lista.add(jsonArray.getJSONObject(i));
+                }
+
+                Collections.sort(lista, new Comparator<JSONObject>() {
+                    @Override
+                    public int compare(JSONObject o1, JSONObject o2) {
+                        try {
+                            return o1.getString("date").compareTo(o2.getString("date"));
+                        } catch (JSONException e) {
+                            return 0;
+                        }
+                    }
+                });
+
+                for (int i=0;i<lista.size();i++)
+                    jsonArray.put(i,lista.get(i));
+
+
                 final JSONObject jsonObject = Activo(jsonArray);
 
                 if(jsonObject!=null) {
@@ -221,7 +243,7 @@ public class UniqueActivity extends Fragment {
                     });
 
 
-                    new LoadImage((ImageView) v.findViewById(R.id.ActivityImage)).execute(jsonObject.getString("imagePath"));
+                    new LoadImages((ImageView) v.findViewById(R.id.ActivityImage)).execute(jsonObject.getString("imagePath"));
                 }
 
             } catch (JSONException e) {
