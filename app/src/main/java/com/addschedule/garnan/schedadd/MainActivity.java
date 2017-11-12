@@ -246,7 +246,12 @@ public class MainActivity extends AppCompatActivity {
 
                             ppt.put("id",AdUser.getId()+"");
                             ppt.put("id_son",s.getId()+"");
-
+                            ppt.put("code",s.getCode()+"");
+                            ppt.put("schedules",s.getSchedules()[0]+"");
+                            ppt.put("cel",s.getCellphone()+"");
+                            ppt.put("name",s.getName()+"");
+                            ppt.put("lastname",s.getLastName());
+                            ppt.put("birth",s.getBithday()+"");
 
                             //Toast.makeText(MainActivity.this,ppt.toString(),Toast.LENGTH_SHORT).show();
 

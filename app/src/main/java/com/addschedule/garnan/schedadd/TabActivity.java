@@ -26,6 +26,8 @@ import android.view.ViewGroup;
 
 import android.widget.TextView;
 
+import java.util.Properties;
+
 public class TabActivity extends AppCompatActivity {
 
     /**
@@ -51,6 +53,10 @@ public class TabActivity extends AppCompatActivity {
     private String password;
     private int sons[];
 
+
+    Properties ppt;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,10 +73,12 @@ public class TabActivity extends AppCompatActivity {
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
-        index_id = getIntent().getIntExtra("id",0);
+        /*index_id = getIntent().getIntExtra("id",0);
         username = getIntent().getStringExtra("username");
         password = getIntent().getStringExtra("password");
-        sons = getIntent().getIntArrayExtra("sons");
+        sons = getIntent().getIntArrayExtra("sons");*/
+
+
 
         int [] iconos = new int[]{R.drawable.ic_accessibility_black_24dp,R.drawable.ic_event_note_black_24dp,R.drawable.profile_image,R.drawable.ic_settings_black_24dp};
 
