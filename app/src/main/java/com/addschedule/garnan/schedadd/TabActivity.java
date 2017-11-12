@@ -113,7 +113,7 @@ public class TabActivity extends AppCompatActivity {
         }
 
 
-        int [] iconos = new int[]{R.drawable.ic_event_note_black_24dp,R.drawable.profile_image,R.drawable.ic_settings_black_24dp};
+        int [] iconos = new int[]{R.drawable.ic_notifications_active_black_24dp,R.drawable.ic_event_note_black_24dp,R.drawable.ic_settings_black_24dp};
 
         //tabLayout.getTabAt(1).setIcon(R.drawable.ic_event_note_black_24dp);
 
@@ -236,9 +236,9 @@ public class TabActivity extends AppCompatActivity {
             ImageSpan span;
             switch (position) {
                 case 0:
-                    return "Activities";
+                    return "Actividad";
                 case 1:
-                    return "Profile";
+                    return "ListaActividades";
                 case 2:
                     return "Preferences";
             }
