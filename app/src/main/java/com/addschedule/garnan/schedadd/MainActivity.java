@@ -57,23 +57,27 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        /*ppt = new Properties();
+        ppt = new Properties();
 
         try {
 
-            FileInputStream fi = new FileInputStream(TOKENS);
+            FileInputStream fi = openFileInput(TOKENS);
             ppt.loadFromXML(fi);
             fi.close();
 
-            new GetUsers().execute("https://schedadd-api.herokuapp.com/users/",ppt.getProperty("user"),ppt.getProperty("password"));
+            if(!ppt.getProperty("id").equals(""))
+            {
+                Intent i = new Intent(MainActivity.this,TabActivity.class);
+                startActivity(i);
+            }
 
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            //Toast.makeText(MainActivity.this,"no existe el archivo",Toast.LENGTH_SHORT).show();
         } catch (InvalidPropertiesFormatException e) {
-            e.printStackTrace();
+            Toast.makeText(MainActivity.this,"las propiedades no salieron",Toast.LENGTH_SHORT).show();
         } catch (IOException e) {
-            e.printStackTrace();
-        }*/
+            Toast.makeText(MainActivity.this,"error de lectura",Toast.LENGTH_SHORT).show();
+        }
 
         user = (EditText) findViewById(R.id.mailText);
         password = (EditText) findViewById(R.id.PasswordID);
@@ -122,30 +126,6 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
-            //System.out.println(result);
-            /*try {
-
-                JSONObject jsonObject = new JSONObject();
-                ppt.put("token",jsonObject.getString("token"));
-                ppt.put("id",Integer.toString(jsonObject.getInt("id")));
-                ppt.put("password",pass);
-                ppt.put("user",user);
-
-                FileOutputStream fo = openFileOutput(TOKENS,MODE_PRIVATE);
-
-                ppt.storeToXML(fo,null);
-
-                fo.close();
-
-            } catch (FileNotFoundException e) {
-                //e.printStackTrace();
-                Toast.makeText(MainActivity.this,"Token no encontrado",Toast.LENGTH_SHORT).show();
-            } catch (JSONException e) {
-                //e.printStackTrace();
-                Toast.makeText(MainActivity.this,"Error al guardar sesion",Toast.LENGTH_SHORT).show();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }*/
 
             try {
                 JSONObject jsonObject = new JSONObject(result);
@@ -259,6 +239,34 @@ public class MainActivity extends AppCompatActivity {
                         if(codex!=-1)
                         {
                             //Toast.makeText(MainActivity.this,"se concecto con exito",Toast.LENGTH_SHORT).show();
+                            //ppt.put("user",AdUser);
+                            //ppt.put("son",sons.get(codex));
+
+                            Son s = sons.get(codex);
+
+                            ppt.put("id",AdUser.getId()+"");
+                            ppt.put("id_son",s.getId()+"");
+
+
+                            //Toast.makeText(MainActivity.this,ppt.toString(),Toast.LENGTH_SHORT).show();
+
+                            try {
+                                FileOutputStream fos = openFileOutput(TOKENS,MODE_PRIVATE);
+                                ppt.storeToXML(fos,null);
+                                fos.close();
+
+
+                                Intent i = new Intent(MainActivity.this,TabActivity.class);
+
+                                startActivity(i);
+
+
+                            } catch (FileNotFoundException e) {
+                                Toast.makeText(MainActivity.this,"Error al guardar la sesion",Toast.LENGTH_SHORT).show();
+                            } catch (IOException e) {
+                                Toast.makeText(MainActivity.this,"Error al guardar la el archivo",Toast.LENGTH_SHORT).show();
+                            }
+
 
                         }
                         else
