@@ -4,14 +4,17 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.addschedule.garnan.schedadd.Api.Clases.Son;
 import com.addschedule.garnan.schedadd.Api.Clases.User;
 import com.github.kevinsawicki.http.HttpRequest;
 
@@ -27,6 +30,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.InvalidPropertiesFormatException;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -36,10 +40,12 @@ public class MainActivity extends AppCompatActivity {
 
     CircularProgressButton login;
 
-    ArrayList<User> users;
+    User AdUser;
 
     EditText user;
     EditText password;
+
+    List<Son> sons;
 
     Properties ppt;
 
@@ -55,24 +61,26 @@ public class MainActivity extends AppCompatActivity {
 
         try {
 
-            FileInputStream fi = new FileInputStream(TOKENS);
+            FileInputStream fi = openFileInput(TOKENS);
             ppt.loadFromXML(fi);
             fi.close();
 
-            new GetUsers().execute("https://schedadd-api.herokuapp.com/users/",ppt.getProperty("user"),ppt.getProperty("password"));
+            if(!ppt.getProperty("id").equals(""))
+            {
+                Intent i = new Intent(MainActivity.this,TabActivity.class);
+                startActivity(i);
+            }
 
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            //Toast.makeText(MainActivity.this,"no existe el archivo",Toast.LENGTH_SHORT).show();
         } catch (InvalidPropertiesFormatException e) {
-            e.printStackTrace();
+            Toast.makeText(MainActivity.this,"las propiedades no salieron",Toast.LENGTH_SHORT).show();
         } catch (IOException e) {
-            e.printStackTrace();
+            Toast.makeText(MainActivity.this,"error de lectura",Toast.LENGTH_SHORT).show();
         }
 
         user = (EditText) findViewById(R.id.mailText);
         password = (EditText) findViewById(R.id.PasswordID);
-
-
 
         login = (CircularProgressButton) findViewById(R.id.Login);
 
@@ -82,11 +90,19 @@ public class MainActivity extends AppCompatActivity {
     {
         String username = user.getText().toString(),pass = password.getText().toString();
 
-        //System.out.println(username+" "+pass);
+        login.startAnimation();
 
-        new GetUsers().execute("https://schedadd-api.herokuapp.com/users/",username,pass);
+        new GetToken().execute("https://schedadd-api.herokuapp.com/get-token/",username,pass);
 
 
+    }
+
+    private int BuscarChild(String code)
+    {
+        for (int i=0;i<sons.size();i++)
+            if(sons.get(i).getCode().equals(code))
+                return i;
+        return -1;
     }
 
 
@@ -110,156 +126,176 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
-            //System.out.println(result);
+
             try {
+                JSONObject jsonObject = new JSONObject(result);
 
-                JSONObject jsonObject = new JSONObject();
-                ppt.put("token",jsonObject.getString("token"));
-                ppt.put("id",Integer.toString(jsonObject.getInt("id")));
-                ppt.put("password",pass);
-                ppt.put("user",user);
+                if(jsonObject.getString("id") != null)
+                    new GetUsers().execute("https://schedadd-api.herokuapp.com/users/",user,pass,jsonObject.getString("id"));
 
-                FileOutputStream fo = openFileOutput(TOKENS,MODE_PRIVATE);
+            } catch (JSONException e) {
+                Toast.makeText(MainActivity.this,"error de login",Toast.LENGTH_SHORT).show();
+                login.revertAnimation();
+            }
 
-                ppt.storeToXML(fo,null);
 
-                fo.close();
+            //new GetUsers().execute("https://schedadd-api.herokuapp.com/users/",)
+        }
+    }
 
-            } catch (FileNotFoundException e) {
-                //e.printStackTrace();
-                Toast.makeText(MainActivity.this,"Token no encontrado",Toast.LENGTH_SHORT).show();
+    private class GetUsers extends AsyncTask<String,Void,String>{
+
+        private String id,user,pass;
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            user = params[1];
+            pass = params[2];
+            id = params[3];
+
+            return HttpRequest.get(params[0]).accept("application/json").basic(params[1],params[2]).body();
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+
+            //Toast.makeText(MainActivity.this,id+" "+result,Toast.LENGTH_LONG).show();
+
+            try {
+                JSONArray jsonArray = new JSONArray(result);
+
+                JSONObject jsonObject = new JSONObject(jsonArray.get(Integer.parseInt(id)-1).toString());
+
+                int sons [] = new int[jsonObject.getJSONArray("sons").length()];
+
+                for (int i=0;i<sons.length;i++)
+                    sons[i] = jsonObject.getJSONArray("sons").getInt(i);
+
+                AdUser = new User(jsonObject.getInt("id"),jsonObject.getString("username"),
+                        jsonObject.getString("first_name"),
+                        jsonObject.getString("last_name"),jsonObject.getString("email"),sons);
+
+
+                new GetSons().execute("https://schedadd-api.herokuapp.com/sons/",id,user,pass);
+
             } catch (JSONException e) {
                 //e.printStackTrace();
-                Toast.makeText(MainActivity.this,"Error al guardar sesion",Toast.LENGTH_SHORT).show();
-            } catch (IOException e) {
-                e.printStackTrace();
+                login.revertAnimation();
             }
 
 
         }
     }
 
-    private class GetUsers extends AsyncTask<String,Void,String>{
+    private class GetSons extends AsyncTask<String,Void,String>
+    {
+
+        private String id,user,pass;
 
         @Override
         protected String doInBackground(String... params) {
-
-            try {
-
-                return HttpRequest.get(params[0]).accept("application/json").basic(params[1],params[2]).body();
-            }catch (Exception e){
-                return "";
-            }
+            id = params[1];
+            user = params[2];
+            pass = params[3];
+            return HttpRequest.get(params[0]).basic(user,pass).body();
         }
 
         @Override
-        protected void onPostExecute(String result) {
-            if(result.isEmpty())
-            {
-                Toast.makeText(MainActivity.this,"No hay resultados",Toast.LENGTH_LONG);
-            }
-            else
-            {
-                //System.out.println(result);
+        protected void onPostExecute(String s) {
 
-                try {
-                    JSONArray jsonArray = new JSONArray(result);
-                    users = new ArrayList<>();
+            sons = new ArrayList<>();
 
-                    for(int i=0;i<jsonArray.length();i++) {
-                        System.out.println(jsonArray.get(i));
-                        JSONObject jsonObject = jsonArray.getJSONObject(i);
-                        //System.out.println(jsonObject.getString("username"));
+            try {
+                JSONArray jsonArray = new JSONArray(s);
 
-                        JSONArray subarray = jsonObject.getJSONArray("sons");
+                for (int i=0;i<jsonArray.length();i++){
 
-                        int [] sons = new int [subarray.length()];
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
 
-                        for (int j=0;j<subarray.length();j++) {
-                            sons[j] = subarray.getInt(j);
-                            //System.out.println(sons[j]);
-                        }
+                    int sche [] = new int[jsonObject.getJSONArray("schedules").length()];
 
-                        users.add(new User(jsonObject.getInt("id"),jsonObject.getString("username")
-                        ,jsonObject.getString("first_name"),jsonObject.getString("last_name")
-                        ,jsonObject.getString("email"),sons));
+                    for (int j=0;j<sche.length;j++)
+                        sche[j] = jsonObject.getJSONArray("schedules").getInt(j);
 
-                        //System.out.println(users.get(i).getId());
-                    }
+                    sons.add(new Son(jsonObject.getInt("id"),jsonObject.getString("name"),jsonObject.getString("lastName"),
+                            jsonObject.getString("birthday"),jsonObject.getString("gender"),jsonObject.getString("code"),
+                            jsonObject.getString("cellphone"),jsonObject.getInt("parentID"),sche));
 
-                    //System.out.println(users.get(0).getFirst_name());
-
-                    AsyncTask<String,String,String> demo = new AsyncTask<String, String, String>() {
-
-                        int index;
-
-                        @Override
-                        protected String doInBackground(String... params) {
-                /*try{
-                    Thread.sleep(3000);
                 }
-                catch (Exception e){
-                    e.printStackTrace();
-                }*/
 
-                            String comp = user.getText().toString();
-                            String finale = "notdone";
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
 
-                            for (int i=0;i<users.size();i++)
-                                if(users.get(i).getUsername().equals(comp)) {
-                                    finale = "done";
-                                    index = i;
-                                }
+                View v = getLayoutInflater().inflate(R.layout.codeinput,null);
 
-                            return finale;
-                        }
+                final EditText code = (EditText) v.findViewById(R.id.codeInput);
 
-                        @Override
-                        protected void onPostExecute(String s) {
-                            //System.out.println(s);
-                            System.out.println(user.getText().toString());
-                            if(s.equals("done")){
+                Button accp = (Button) v.findViewById(R.id.LogCode);
 
-                                new GetToken().execute("https://schedadd-api.herokuapp.com/get-token/",user.getText().toString(),password.getText().toString());
+                accp.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int codex = BuscarChild(code.getText().toString());
+                        if(codex!=-1)
+                        {
+                            //Toast.makeText(MainActivity.this,"se concecto con exito",Toast.LENGTH_SHORT).show();
+                            //ppt.put("user",AdUser);
+                            //ppt.put("son",sons.get(codex));
 
-                                login.startAnimation();
+                            Son s = sons.get(codex);
 
-                                User u = users.get(index);
+                            ppt.put("id",AdUser.getId()+"");
+                            ppt.put("id_son",s.getId()+"");
+                            ppt.put("code",s.getCode()+"");
+                            ppt.put("schedules",s.getSchedules()[0]+"");
+                            ppt.put("cel",s.getCellphone()+"");
+                            ppt.put("name",s.getName()+"");
+                            ppt.put("gender",s.getGender());
+                            ppt.put("lastname",s.getLastName());
+                            ppt.put("birth",s.getBithday()+"");
 
+                            ppt.put("username",user);
+                            ppt.put("password",pass);
+
+
+                            //Toast.makeText(MainActivity.this,ppt.toString(),Toast.LENGTH_SHORT).show();
+
+                            try {
+                                FileOutputStream fos = openFileOutput(TOKENS,MODE_PRIVATE);
+                                ppt.storeToXML(fos,null);
+                                fos.close();
 
 
                                 Intent i = new Intent(MainActivity.this,TabActivity.class);
-                                i.putExtra("id",u.getId());
-                                i.putExtra("username",u.getUsername());
-                                i.putExtra("password",password.getText().toString());
-                                i.putExtra("sons",u.getSons());
+
                                 startActivity(i);
-                                finish();
+
+
+                            } catch (FileNotFoundException e) {
+                                Toast.makeText(MainActivity.this,"Error al guardar la sesion",Toast.LENGTH_SHORT).show();
+                            } catch (IOException e) {
+                                Toast.makeText(MainActivity.this,"Error al guardar la el archivo",Toast.LENGTH_SHORT).show();
                             }
-                            if(s.equals("notdone")){
-                                login.stopAnimation();
-                                Toast.makeText(MainActivity.this,"Login incorrecto",Toast.LENGTH_LONG).show();
-                            }
+
+
                         }
-                    };
+                        else
+                            Toast.makeText(MainActivity.this,"error con el codigo",Toast.LENGTH_LONG).show();
+                    }
+                });
 
-                    demo.execute();
+                builder.setView(v);
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
 
-                } catch (JSONException e) {
-                    //e.printStackTrace();
-                    Toast.makeText(MainActivity.this,"Error en login",Toast.LENGTH_LONG);
-                }
-
+                login.revertAnimation();
 
 
-
-                /*ArrayList<User> Users = User.Users(result);
-                ArrayList<User> AUX = new ArrayList<>();
-
-                for (User u: Users) {
-                    System.out.println(u);
-                }*/
+            } catch (JSONException e) {
+                e.printStackTrace();
+                login.revertAnimation();
             }
+
         }
     }
 }

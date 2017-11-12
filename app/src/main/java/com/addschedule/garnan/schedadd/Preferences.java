@@ -5,10 +5,19 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Properties;
 
 
 /**
@@ -29,6 +38,8 @@ public class Preferences extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    private static Properties ppt;
+
     private OnFragmentInteractionListener mListener;
 
     public Preferences() {
@@ -39,14 +50,13 @@ public class Preferences extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
      * @return A new instance of fragment Preferences.
      */
     // TODO: Rename and change types and number of parameters
-    public static Preferences newInstance() {
+    public static Preferences newInstance(Properties p) {
         Preferences fragment = new Preferences();
         Bundle args = new Bundle();
+        ppt = p;
         fragment.setArguments(args);
         return fragment;
     }
@@ -68,12 +78,60 @@ public class Preferences extends Fragment {
 
         Button b = (Button) v.findViewById(R.id.logout);
 
+        TextView nombre = (TextView) v.findViewById(R.id.Nombre_Pre);
+        TextView cumple = (TextView) v.findViewById(R.id.cumple_pre);
+        TextView sexo = (TextView) v.findViewById(R.id.genero_pre);
+
+        nombre.append(ppt.getProperty("name")+" "+ppt.getProperty("lastname"));
+        cumple.append(ppt.getProperty("birth"));
+        sexo.append(ppt.getProperty("gender"));
+
+
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(getContext(),MainActivity.class);
-                startActivity(i);
-                getActivity().finish();
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+                View v1 = getActivity().getLayoutInflater().inflate(R.layout.codeinput,null);
+
+                final EditText code = (EditText) v1.findViewById(R.id.codeInput);
+
+                Button accp = (Button) v1.findViewById(R.id.LogCode);
+
+                accp.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if(code.getText().toString().equals(ppt.getProperty("code")))
+                        {
+                            ppt.setProperty("id","");
+
+                            try {
+                                FileOutputStream fos = getActivity().openFileOutput(MainActivity.TOKENS,getContext().MODE_PRIVATE);
+                                ppt.storeToXML(fos,null);
+                                fos.close();
+
+
+                                Intent i = new Intent(getContext(),MainActivity.class);
+                                startActivity(i);
+                                getActivity().finish();
+
+                            } catch (FileNotFoundException e) {
+                                Toast.makeText(getActivity(),"Error al guardar la sesion",Toast.LENGTH_SHORT).show();
+                            } catch (IOException e) {
+                                Toast.makeText(getActivity(),"Error al guardar la el archivo",Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                        else
+                            Toast.makeText(getActivity(),"Codigo incorrecto para cerrar sesion",Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                builder.setView(v1);
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
+
+
             }
         });
 
