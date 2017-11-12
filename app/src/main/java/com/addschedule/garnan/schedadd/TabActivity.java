@@ -113,7 +113,7 @@ public class TabActivity extends AppCompatActivity {
         }
 
 
-        int [] iconos = new int[]{R.drawable.ic_accessibility_black_24dp,R.drawable.ic_event_note_black_24dp,R.drawable.profile_image,R.drawable.ic_settings_black_24dp};
+        int [] iconos = new int[]{R.drawable.ic_notifications_active_black_24dp,R.drawable.ic_event_note_black_24dp,R.drawable.ic_settings_black_24dp};
 
         //tabLayout.getTabAt(1).setIcon(R.drawable.ic_event_note_black_24dp);
 
@@ -217,7 +217,9 @@ public class TabActivity extends AppCompatActivity {
                     return AvatarSelector.newInstance();
                 case 3:
                     return Preferences.newInstance();*/
-                case 3:
+                case 0:
+                    return UniqueActivity.newInstance(ppt);
+                case 2:
                     return Preferences.newInstance(ppt);
                 default:
                     return PlaceholderFragment.newInstance(position + 1);
@@ -227,7 +229,7 @@ public class TabActivity extends AppCompatActivity {
         @Override
         public int getCount() {
             // Show 3 total pages.
-            return 4;
+            return 3;
         }
 
         @Override
@@ -236,12 +238,10 @@ public class TabActivity extends AppCompatActivity {
             ImageSpan span;
             switch (position) {
                 case 0:
-                    return "Children";
+                    return "Actividad";
                 case 1:
-                    return "Activities";
+                    return "ListaActividades";
                 case 2:
-                    return "Profile";
-                case 3:
                     return "Preferences";
             }
             return null;

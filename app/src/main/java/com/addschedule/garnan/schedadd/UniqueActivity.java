@@ -1,12 +1,36 @@
 package com.addschedule.garnan.schedadd;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.github.kevinsawicki.http.HttpRequest;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.InputStream;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 
 /**
@@ -27,6 +51,10 @@ public class UniqueActivity extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    private ImageView imagenActividad;
+
+    private static Properties ppt;
+
     private OnFragmentInteractionListener mListener;
 
     public UniqueActivity() {
@@ -37,16 +65,15 @@ public class UniqueActivity extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
      * @return A new instance of fragment UniqueActivity.
      */
     // TODO: Rename and change types and number of parameters
-    public static UniqueActivity newInstance(String param1, String param2) {
+    public static UniqueActivity newInstance(Properties p) {
         UniqueActivity fragment = new UniqueActivity();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+
+        ppt = p;
+
         fragment.setArguments(args);
         return fragment;
     }
@@ -54,17 +81,20 @@ public class UniqueActivity extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_unique, container, false);
+        View v = inflater.inflate(R.layout.fragment_unique, container, false);
+
+        new GetActivity(v).execute("https://schedadd-api.herokuapp.com/activities/",
+                ppt.getProperty("username"),ppt.getProperty("password"));
+
+        //new LoadImage((ImageView) v.findViewById(R.id.ActivityImage)).execute("http://papasabordo.com/Portal/papas-a-bordo/uploads/2015/03/consejos-tareas-1728x800_c.jpg");
+
+        return v;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -105,4 +135,146 @@ public class UniqueActivity extends Fragment {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
+
+    private class GetActivity extends AsyncTask<String,Void,String>
+    {
+
+        private View v;
+
+        public GetActivity(View v)
+        {
+            this.v = v;
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            Map<String,String> pt = new HashMap<>();
+
+            pt.put("name","jugar xbox");
+
+            System.out.println(params[0]+"1");
+
+            //HttpRequest.put(params[0]+"1").form(pt).accept(MainActivity.JSON_DATA).basic(params[1],params[2]);
+
+            return HttpRequest.get(params[0]).basic(params[1],params[2]).body();
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            try {
+                final JSONArray jsonArray = new JSONArray(s);
+
+                final JSONObject jsonObject = jsonArray.getJSONObject(0);
+
+                TextView name = (TextView) v.findViewById(R.id.ActivityName);
+
+                name.append(jsonObject.getString("name"));
+
+                TextView description = (TextView) v.findViewById(R.id.Description2);
+
+                description.setText(jsonObject.getString("description"));
+
+                String st = jsonObject.getString("steps").replace(";","\n");
+
+                TextView steps = (TextView) v.findViewById(R.id.ActivitySteps);
+
+                steps.setText(st);
+
+                Button panic = (Button) v.findViewById(R.id.PanicActivity);
+
+                panic.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        try {
+                            new PanicCall().execute("https://schedadd-api.herokuapp.com/panicbuttoncalls/",
+                                    ppt.getProperty("username"),ppt.getProperty("password"),
+                                    String.valueOf(jsonObject.getInt("id")),ppt.getProperty("id_son"));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        Intent intent = new Intent(Intent.ACTION_CALL);
+                        intent.setData(Uri.parse("tel:"+ppt.getProperty("cel")));
+                        //startActivity(intent);
+
+                        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CALL_PHONE},1);
+                            }
+                            else
+                            {
+                                startActivity(intent);
+                            }
+                        }
+                        else
+                        {
+                            startActivity(intent);
+                        }
+                    }
+                });
+
+
+                new LoadImage((ImageView) v.findViewById(R.id.ActivityImage)).execute(jsonObject.getString("imagePath"));
+
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private class LoadImage extends AsyncTask<String,Void,Bitmap>
+    {
+
+        ImageView bmImageView;
+
+        public LoadImage(ImageView bmImageView)
+        {
+            this.bmImageView = bmImageView;
+        }
+
+        @Override
+        protected Bitmap doInBackground(String... params) {
+            Bitmap icon = null;
+            try{
+                InputStream in = new URL(params[0]).openStream();
+                icon = BitmapFactory.decodeStream(in);
+            }
+            catch (Exception e)
+            {
+
+            }
+
+            return icon;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            bmImageView.setImageBitmap(bitmap);
+        }
+    }
+
+    private class PanicCall extends AsyncTask<String,Void,String>
+    {
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            Map<String,Integer> call = new HashMap<>();
+
+            System.out.println(params[1]);
+
+            call.put("activityID",Integer.parseInt(params[3]));
+            call.put("sonID",Integer.parseInt(params[4]));
+
+            return HttpRequest.post(params[0]).basic(params[1],params[2]).form(call).body();
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            System.out.println(s);
+        }
+    }
+
 }
