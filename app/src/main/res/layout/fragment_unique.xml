@@ -63,7 +63,7 @@
                     app:fabSize="normal"
                     android:layout_marginLeft="50dp"
                     android:layout_marginBottom="10dp"
-                    app:srcCompat="@android:drawable/ic_input_add"
+                    app:srcCompat="@drawable/checkmark"
                     android:id="@+id/Done"
                     android:layout_weight="1"
                     app:backgroundTint="@android:color/holo_green_dark" />
