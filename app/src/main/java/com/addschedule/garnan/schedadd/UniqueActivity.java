@@ -366,15 +366,10 @@ public class UniqueActivity extends Fragment {
         private JSONObject Activo(JSONArray jsonArray) throws JSONException, ParseException {
 
             Date date = new Date();
-            //"2017-11-01T22:42:00Z"
 
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-            String date1 = dateFormat.format(date);
+            String date1 = new SimpleDateFormat("yyyy-MM-dd").format(date);
 
             String hour = new SimpleDateFormat("hh:mm:ss").format(date);
-
-            System.out.println(date1+"T"+hour+"Z");
 
             String convertercomp = date1+"T"+hour+"Z";
 
