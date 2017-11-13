@@ -78,6 +78,9 @@ public class UniqueActivity extends Fragment {
 
     private  JSONObject object_finale;
 
+    private int ind;
+    private JSONArray jsonArray;
+
     private static Properties ppt;
 
     private OnFragmentInteractionListener mListener;
@@ -127,8 +130,69 @@ public class UniqueActivity extends Fragment {
                 //Toast.makeText(getContext(),object_finale.toString(),Toast.LENGTH_SHORT).show();
 
                     //object_finale.put("state","Cancelado");
-                    new PutState(v).execute("https://schedadd-api.herokuapp.com/activities/",ppt.getProperty("username"),
-                            ppt.getProperty("password"),"Cancelado");
+                    /*new PutState(v).execute("https://schedadd-api.herokuapp.com/activities/",ppt.getProperty("username"),
+                            ppt.getProperty("password"),"Cancelado");*/
+
+
+                final JSONObject jsonObject;
+                try {
+                    ++ind;
+                    jsonObject = jsonArray.getJSONObject(ind);
+
+                    object_finale = jsonObject;
+
+                    if(jsonObject!=null) {
+
+                        TextView name = (TextView) v.findViewById(R.id.ActivityName);
+
+                        name.setText("Nombre: "+jsonObject.getString("name"));
+
+                        TextView description = (TextView) v.findViewById(R.id.Description2);
+
+                        description.setText(jsonObject.getString("description"));
+
+                        String st = jsonObject.getString("steps").replace(";", "\n");
+
+                        TextView steps = (TextView) v.findViewById(R.id.ActivitySteps);
+
+                        steps.setText(st);
+
+                        Button panic = (Button) v.findViewById(R.id.PanicActivity);
+
+                        panic.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                try {
+                                    new PanicCall().execute("https://schedadd-api.herokuapp.com/panicbuttoncalls/",
+                                            ppt.getProperty("username"), ppt.getProperty("password"),
+                                            String.valueOf(jsonObject.getInt("id")), ppt.getProperty("id_son"));
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
+                                Intent intent = new Intent(Intent.ACTION_CALL);
+                                intent.setData(Uri.parse("tel:" + ppt.getProperty("cel")));
+                                //startActivity(intent);
+
+                                if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                    if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                                        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CALL_PHONE}, 1);
+                                    } else {
+                                        startActivity(intent);
+                                    }
+                                } else {
+                                    startActivity(intent);
+                                }
+                            }
+                        });
+
+
+                        new LoadImages((ImageView) v.findViewById(R.id.ActivityImage)).execute(jsonObject.getString("imagePath"));
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
 
             }
@@ -143,8 +207,70 @@ public class UniqueActivity extends Fragment {
             public void onClick(View v1) {
                 //Toast.makeText(getActivity(),"hecho",Toast.LENGTH_SHORT).show();
 
-                new PutState(v).execute("https://schedadd-api.herokuapp.com/activities/",ppt.getProperty("username"),
-                            ppt.getProperty("password"),"Hecho");
+                /*new PutState(v).execute("https://schedadd-api.herokuapp.com/activities/",ppt.getProperty("username"),
+                            ppt.getProperty("password"),"Hecho");*/
+
+
+                final JSONObject jsonObject;
+                try {
+                    ++ind;
+                    jsonObject = jsonArray.getJSONObject(ind);
+
+                    object_finale = jsonObject;
+
+                    if(jsonObject!=null) {
+
+                        TextView name = (TextView) v.findViewById(R.id.ActivityName);
+
+                        name.setText("Nombre: "+jsonObject.getString("name"));
+
+                        TextView description = (TextView) v.findViewById(R.id.Description2);
+
+                        description.setText(jsonObject.getString("description"));
+
+                        String st = jsonObject.getString("steps").replace(";", "\n");
+
+                        TextView steps = (TextView) v.findViewById(R.id.ActivitySteps);
+
+                        steps.setText(st);
+
+                        Button panic = (Button) v.findViewById(R.id.PanicActivity);
+
+                        panic.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                try {
+                                    new PanicCall().execute("https://schedadd-api.herokuapp.com/panicbuttoncalls/",
+                                            ppt.getProperty("username"), ppt.getProperty("password"),
+                                            String.valueOf(jsonObject.getInt("id")), ppt.getProperty("id_son"));
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
+                                Intent intent = new Intent(Intent.ACTION_CALL);
+                                intent.setData(Uri.parse("tel:" + ppt.getProperty("cel")));
+                                //startActivity(intent);
+
+                                if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                    if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                                        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CALL_PHONE}, 1);
+                                    } else {
+                                        startActivity(intent);
+                                    }
+                                } else {
+                                    startActivity(intent);
+                                }
+                            }
+                        });
+
+
+                        new LoadImages((ImageView) v.findViewById(R.id.ActivityImage)).execute(jsonObject.getString("imagePath"));
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
 
             }
         });
@@ -340,7 +466,6 @@ public class UniqueActivity extends Fragment {
 
     private class GetActivity extends AsyncTask<String,Void,String>
     {
-
         private View v;
 
         public GetActivity(View v)
@@ -354,6 +479,8 @@ public class UniqueActivity extends Fragment {
             Map<String,String> pt = new HashMap<>();
 
             pt.put("name","jugar xbox");
+
+
 
             //System.out.println(params[0]+"1");
 
@@ -375,8 +502,11 @@ public class UniqueActivity extends Fragment {
 
             for (int i=0;i<jsonArray.length();i++)
                 if (jsonArray.getJSONObject(i).getString("state").equalsIgnoreCase("Activo")
-                        && (convertercomp.compareTo(jsonArray.getJSONObject(i).getString("date")))<=0)
+                        && (convertercomp.compareTo(jsonArray.getJSONObject(i).getString("date")))<=0) {
+                    ind = i;
                     return jsonArray.getJSONObject(i);
+
+                }
 
             return null;
         }
@@ -384,7 +514,7 @@ public class UniqueActivity extends Fragment {
         @Override
         protected void onPostExecute(String s) {
             try {
-                final JSONArray jsonArray = new JSONArray(s);
+                jsonArray = new JSONArray(s);
 
                 List<JSONObject> lista = new ArrayList<>();
 
