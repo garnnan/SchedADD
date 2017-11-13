@@ -23,6 +23,11 @@ import android.widget.Toast;
 
 import com.github.kevinsawicki.http.HttpRequest;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -163,11 +168,47 @@ public class UniqueActivity extends Fragment {
             this.v = v;
         }
 
+
+
         @Override
         protected String doInBackground(final String... params) {
+
+            InputStream inputStream = null;
+            String result = "";
             try {
 
-                
+                HttpClient httpClient = new DefaultHttpClient();
+
+                HttpPut httpPut = new HttpPut(params[0]+object_finale.getInt("id"));
+
+                StringEntity se = new StringEntity(object_finale.toString());
+
+                httpPut.setEntity(se);
+
+                String basic = params[1]+":"+params[2];
+
+                String auth = "Basic " + new String(Base64.encode(basic.getBytes(),Base64.NO_WRAP));
+
+                httpPut.addHeader("Accept", "application/json");
+                httpPut.addHeader("Content-type", "application/json");
+                httpPut.addHeader("Authorization",auth);
+
+                HttpResponse httpResponse = httpClient.execute(httpPut);
+
+                inputStream = httpResponse.getEntity().getContent();
+
+                if(inputStream != null) {
+                    int bytechar;
+
+                    while ((bytechar = inputStream.read()) != -1) {
+                        result += (char) bytechar;
+                    }
+                }
+                else
+                    result = "Did not work!";
+
+
+                /*
 
                 System.out.println(params[0]+object_finale.getInt("id"));
                 object_finale.put("state",params[3]);
@@ -185,7 +226,7 @@ public class UniqueActivity extends Fragment {
                 forma_string.put("date",object_finale.getString("date"));
                 forma_int.put("duration",object_finale.optInt("duration"));
                 forma_int.put("scheduleID",object_finale.optInt("scheduleID"));
-                forma_int.put("parentID",object_finale.optInt("parentID"));
+                forma_int.put("parentID",object_finale.optInt("parentID"));*/
 
                 //return HttpRequest.put(params[0]+object_finale.getInt("id")).basic(params[1],params[2]).form(forma_int).form(forma_string).body();
                 //return HttpRequest.put(params[0]+object_finale.getInt("id")).basic(params[1],params[2]).header(MainActivity.JSON_DATA,object_finale.toString()).body();
@@ -195,7 +236,7 @@ public class UniqueActivity extends Fragment {
                         "date",object_finale.getString("date"),"duration",object_finale.optInt("duration"),
                         "scheduleID",object_finale.optInt("scheduleID"),"parentID",object_finale.optInt("parentID")).basic(params[1],params[2]).acceptJson().body();*/
 
-                String basic = params[1]+":"+params[2];
+                /*String basic = params[1]+":"+params[2];
 
                 String auth = "Basic " + new String(Base64.encode(basic.getBytes(),Base64.NO_WRAP));
 
@@ -232,7 +273,7 @@ public class UniqueActivity extends Fragment {
                 dos.close();
                 httpURLConnection.disconnect();
 
-                return result;
+                return result;*/
 
 
 
@@ -244,17 +285,11 @@ public class UniqueActivity extends Fragment {
                         .
                         .body();*/
 
-            } catch (JSONException e) {
-                e.printStackTrace();
-            } catch (ProtocolException e) {
-                e.printStackTrace();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 
-            return "";
+            return result;
         }
 
         @Override
