@@ -166,6 +166,9 @@ public class UniqueActivity extends Fragment {
         @Override
         protected String doInBackground(final String... params) {
             try {
+
+                
+
                 System.out.println(params[0]+object_finale.getInt("id"));
                 object_finale.put("state",params[3]);
                 //System.out.println(object_finale.toString());
