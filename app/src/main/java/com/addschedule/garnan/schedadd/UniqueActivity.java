@@ -43,9 +43,13 @@ import java.net.PasswordAuthentication;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -359,10 +363,26 @@ public class UniqueActivity extends Fragment {
         }
 
 
-        private JSONObject Activo(JSONArray jsonArray) throws JSONException {
+        private JSONObject Activo(JSONArray jsonArray) throws JSONException, ParseException {
+
+            Date date = new Date();
+            //"2017-11-01T22:42:00Z"
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+            String date1 = dateFormat.format(date);
+
+            String hour = new SimpleDateFormat("hh:mm:ss").format(date);
+
+            System.out.println(date1+"T"+hour+"Z");
+
+            String convertercomp = date1+"T"+hour+"Z";
+
             for (int i=0;i<jsonArray.length();i++)
-                if(jsonArray.getJSONObject(i).getString("state").equalsIgnoreCase("Activo"))
+                if (jsonArray.getJSONObject(i).getString("state").equalsIgnoreCase("Activo")
+                        && (convertercomp.compareTo(jsonArray.getJSONObject(i).getString("date")))<=0)
                     return jsonArray.getJSONObject(i);
+
             return null;
         }
 
@@ -447,6 +467,8 @@ public class UniqueActivity extends Fragment {
                 }
 
             } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (ParseException e) {
                 e.printStackTrace();
             }
         }
