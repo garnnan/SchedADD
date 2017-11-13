@@ -8,15 +8,18 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.kevinsawicki.http.HttpRequest;
 
@@ -24,6 +27,17 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.Authenticator;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.PasswordAuthentication;
+import java.net.ProtocolException;
+import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -52,6 +66,8 @@ public class UniqueActivity extends Fragment {
     private String mParam2;
 
     private ImageView imagenActividad;
+
+    private  JSONObject object_finale;
 
     private static Properties ppt;
 
@@ -87,10 +103,43 @@ public class UniqueActivity extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_unique, container, false);
+        final View v = inflater.inflate(R.layout.fragment_unique, container, false);
 
         new GetActivity(v).execute("https://schedadd-api.herokuapp.com/activities/",
                 ppt.getProperty("username"),ppt.getProperty("password"));
+
+        FloatingActionButton cancel = (FloatingActionButton) v.findViewById(R.id.Cancel);
+
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v1) {
+                //Toast.makeText(getActivity(),"cancelar",Toast.LENGTH_SHORT).show();
+
+                //Toast.makeText(getContext(),object_finale.toString(),Toast.LENGTH_SHORT).show();
+
+                    //object_finale.put("state","Cancelado");
+                    new PutState(v).execute("https://schedadd-api.herokuapp.com/activities/",ppt.getProperty("username"),
+                            ppt.getProperty("password"),"Cancelado");
+
+
+            }
+        });
+
+        //final String basicAuth = "Basic"+ Base64.encodeToString((ppt.getProperty("username")+":"+ppt.getProperty("password")).getBytes(),Base64.NO_WRAP);
+
+        FloatingActionButton done = (FloatingActionButton) v.findViewById(R.id.Done);
+
+        done.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v1) {
+                //Toast.makeText(getActivity(),"hecho",Toast.LENGTH_SHORT).show();
+
+                new PutState(v).execute("https://schedadd-api.herokuapp.com/activities/",ppt.getProperty("username"),
+                            ppt.getProperty("password"),"Hecho");
+
+            }
+        });
+
 
         //new LoadImages((ImageView) v.findViewById(R.id.ActivityImage)).execute("http://papasabordo.com/Portal/papas-a-bordo/uploads/2015/03/consejos-tareas-1728x800_c.jpg");
 
@@ -103,6 +152,120 @@ public class UniqueActivity extends Fragment {
             mListener.onFragmentInteraction(uri);
         }
     }
+
+
+    private class PutState extends AsyncTask<String,Void,String>
+    {
+        View v;
+
+        public PutState(View v)
+        {
+            this.v = v;
+        }
+
+        @Override
+        protected String doInBackground(final String... params) {
+            try {
+
+                
+
+                System.out.println(params[0]+object_finale.getInt("id"));
+                object_finale.put("state",params[3]);
+                //System.out.println(object_finale.toString());
+
+                Map<String,String> forma_string = new HashMap<>();
+                Map<String,Integer> forma_int = new HashMap<>();
+
+                forma_int.put("id",object_finale.getInt("id"));
+                forma_string.put("name",object_finale.getString("name"));
+                forma_string.put("description",object_finale.getString("description"));
+                forma_string.put("state",object_finale.getString("state"));
+                forma_string.put("steps",object_finale.getString("steps"));
+                forma_string.put("imagePath",object_finale.getString("imagePath"));
+                forma_string.put("date",object_finale.getString("date"));
+                forma_int.put("duration",object_finale.optInt("duration"));
+                forma_int.put("scheduleID",object_finale.optInt("scheduleID"));
+                forma_int.put("parentID",object_finale.optInt("parentID"));
+
+                //return HttpRequest.put(params[0]+object_finale.getInt("id")).basic(params[1],params[2]).form(forma_int).form(forma_string).body();
+                //return HttpRequest.put(params[0]+object_finale.getInt("id")).basic(params[1],params[2]).header(MainActivity.JSON_DATA,object_finale.toString()).body();
+                /*return HttpRequest.put(params[0]+object_finale.getInt("id"),true,"id",object_finale.getInt("id"),"name",object_finale.getString("name"),
+                        "description",object_finale.getString("description"),"state",object_finale.getString("state"),
+                        "steps",object_finale.getString("steps"),"imagePath",object_finale.getString("imagePath"),
+                        "date",object_finale.getString("date"),"duration",object_finale.optInt("duration"),
+                        "scheduleID",object_finale.optInt("scheduleID"),"parentID",object_finale.optInt("parentID")).basic(params[1],params[2]).acceptJson().body();*/
+
+                String basic = params[1]+":"+params[2];
+
+                String auth = "Basic " + new String(Base64.encode(basic.getBytes(),Base64.NO_WRAP));
+
+                String finale = object_finale.toString().replace("\\","");
+
+                System.out.println(finale);
+
+                URL url = new URL(params[0]+object_finale.getInt("id"));
+
+                System.out.println(auth);
+
+                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+                httpURLConnection.setRequestMethod("PUT");
+                httpURLConnection.setDoInput(true);
+                httpURLConnection.setDoOutput(true);
+                httpURLConnection.addRequestProperty("Authorization",auth);
+                httpURLConnection.addRequestProperty("Content-Type",MainActivity.JSON_DATA);
+                httpURLConnection.connect();
+
+                OutputStream dos = httpURLConnection.getOutputStream();
+                dos.write(finale.getBytes());
+
+
+                InputStream is = httpURLConnection.getInputStream();
+                String result = "";
+
+                int bytechar;
+
+                while ((bytechar = is.read())!=-1){
+                    result += (char) bytechar;
+                }
+
+                is.close();
+                dos.close();
+                httpURLConnection.disconnect();
+
+                return result;
+
+
+
+
+
+                /*return HttpRequest.put(params[0]+object_finale.getInt("id"))
+                        .contentType("application/json")
+                        .basic(params[1],params[2])
+                        .
+                        .body();*/
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return "";
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            System.out.println(s);
+            new GetActivity(v).execute("https://schedadd-api.herokuapp.com/activities/",
+                    ppt.getProperty("username"),ppt.getProperty("password"));
+        }
+    }
+
+
 
     @Override
     public void onAttach(Context context) {
@@ -153,7 +316,7 @@ public class UniqueActivity extends Fragment {
 
             pt.put("name","jugar xbox");
 
-            System.out.println(params[0]+"1");
+            //System.out.println(params[0]+"1");
 
             //HttpRequest.put(params[0]+"1").form(pt).accept(MainActivity.JSON_DATA).basic(params[1],params[2]);
 
@@ -197,11 +360,13 @@ public class UniqueActivity extends Fragment {
 
                 final JSONObject jsonObject = Activo(jsonArray);
 
+                object_finale = jsonObject;
+
                 if(jsonObject!=null) {
 
                     TextView name = (TextView) v.findViewById(R.id.ActivityName);
 
-                    name.append(jsonObject.getString("name"));
+                    name.setText("Nombre: "+jsonObject.getString("name"));
 
                     TextView description = (TextView) v.findViewById(R.id.Description2);
 
