@@ -500,9 +500,12 @@ public class UniqueActivity extends Fragment {
 
             String convertercomp = date1+"T"+hour+"Z";
 
+            //System.out.println(convertercomp);
+
+            //System.out.println(jsonArray.getJSONObject(0).getString("date"));
+
             for (int i=0;i<jsonArray.length();i++)
-                if (jsonArray.getJSONObject(i).getString("state").equalsIgnoreCase("Activo")
-                        && (convertercomp.compareTo(jsonArray.getJSONObject(i).getString("date")))<=0) {
+                if ((convertercomp.compareTo(jsonArray.getJSONObject(i).getString("date")))<=0) {
                     ind = i;
                     return jsonArray.getJSONObject(i);
 
