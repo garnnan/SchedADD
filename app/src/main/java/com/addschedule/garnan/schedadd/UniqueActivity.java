@@ -126,10 +126,15 @@ public class UniqueActivity extends Fragment {
         done.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v1) {
-                Toast.makeText(getActivity(),"hecho",Toast.LENGTH_SHORT).show();
 
-                new PutState(v).execute("https://schedadd-api.herokuapp.com/activities/",ppt.getProperty("username"),
-                            ppt.getProperty("password"),"Hecho");
+                try {
+                    Toast.makeText(getActivity(),"Hecho",Toast.LENGTH_SHORT).show();
+                    new PutState(v).execute("https://schedadd-api.herokuapp.com/activities/", ppt.getProperty("username"),
+                            ppt.getProperty("password"), "Hecho");
+                }catch (Exception e)
+                {
+
+                }
             }
         });
 
@@ -458,21 +463,32 @@ public class UniqueActivity extends Fragment {
 
                     TextView name = (TextView) v.findViewById(R.id.ActivityName);
 
-                    name.setEnabled(false);
+                    name.setText("no tienes Actividades Pendientes");
 
                     TextView description = (TextView) v.findViewById(R.id.Description2);
 
                     description.setEnabled(false);
+                    description.setVisibility(View.INVISIBLE);
 
                     TextView steps = (TextView) v.findViewById(R.id.ActivitySteps);
 
                     steps.setEnabled(false);
+                    steps.setVisibility(View.INVISIBLE);
+
+                    FloatingActionButton done = (FloatingActionButton) v.findViewById(R.id.Done);
+
+                    done.setEnabled(false);
+                    done.setVisibility(View.INVISIBLE);
 
                     Button panic = (Button) v.findViewById(R.id.PanicActivity);
 
                     panic.setEnabled(false);
 
+                    (v.findViewById(R.id.ActivityDescription)).setVisibility(View.INVISIBLE);
+
                     ((ImageView) v.findViewById(R.id.ActivityImage)).setEnabled(false);
+                    ((ImageView) v.findViewById(R.id.ActivityImage)).setImageResource(R.drawable.ic_alarm_on_black_24dp);
+                    ((ImageView) v.findViewById(R.id.circular)).setVisibility(View.INVISIBLE);
 
                 }
 
