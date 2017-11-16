@@ -472,6 +472,7 @@ public class UniqueActivity extends Fragment {
 
                     panic.setEnabled(false);
 
+                    ((ImageView) v.findViewById(R.id.ActivityImage)).setEnabled(false);
 
                 }
 
