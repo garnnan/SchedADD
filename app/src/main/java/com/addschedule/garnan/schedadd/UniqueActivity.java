@@ -130,74 +130,8 @@ public class UniqueActivity extends Fragment {
 
                 new PutState(v).execute("https://schedadd-api.herokuapp.com/activities/",ppt.getProperty("username"),
                             ppt.getProperty("password"),"Hecho");
-
-
-                /*final JSONObject jsonObject;
-                try {
-                    ++ind;
-                    jsonObject = jsonArray.getJSONObject(ind);
-
-                    object_finale = jsonObject;
-
-                    if(jsonObject!=null) {
-
-                        TextView name = (TextView) v.findViewById(R.id.ActivityName);
-
-                        name.setText("Nombre: "+jsonObject.getString("name"));
-
-                        TextView description = (TextView) v.findViewById(R.id.Description2);
-
-                        description.setText(jsonObject.getString("description"));
-
-                        String st = jsonObject.getString("steps").replace(";", "\n");
-
-                        TextView steps = (TextView) v.findViewById(R.id.ActivitySteps);
-
-                        steps.setText(st);
-
-                        Button panic = (Button) v.findViewById(R.id.PanicActivity);
-
-                        panic.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                try {
-                                    new PanicCall().execute("https://schedadd-api.herokuapp.com/panicbuttoncalls/",
-                                            ppt.getProperty("username"), ppt.getProperty("password"),
-                                            String.valueOf(jsonObject.getInt("id")), ppt.getProperty("id_son"));
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-
-                                Intent intent = new Intent(Intent.ACTION_CALL);
-                                intent.setData(Uri.parse("tel:" + ppt.getProperty("cel")));
-                                //startActivity(intent);
-
-                                if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                    if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-                                        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CALL_PHONE}, 1);
-                                    } else {
-                                        startActivity(intent);
-                                    }
-                                } else {
-                                    startActivity(intent);
-                                }
-                            }
-                        });
-
-
-                        new LoadImages((ImageView) v.findViewById(R.id.ActivityImage)).execute(jsonObject.getString("imagePath"));
-                    }
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }*/
-
-
             }
         });
-
-
-        //new LoadImages((ImageView) v.findViewById(R.id.ActivityImage)).execute("http://papasabordo.com/Portal/papas-a-bordo/uploads/2015/03/consejos-tareas-1728x800_c.jpg");
 
         return v;
     }
