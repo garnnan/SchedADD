@@ -85,15 +85,6 @@ public class ListaActividades extends Fragment {
         return v;
     }
 
-    @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-        if(isVisibleToUser) {
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.detach(this).attach(this).commit();
-        }
-    }
-
     private class GetActivities extends AsyncTask<String,Void,String>
     {
 
