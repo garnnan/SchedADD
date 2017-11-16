@@ -51,17 +51,6 @@
                     android:layout_height="wrap_content"
                     android:clickable="true"
                     app:fabSize="normal"
-                    android:layout_marginRight="50dp"
-                    app:srcCompat="@android:drawable/ic_delete"
-                    android:id="@+id/Cancel"
-                    android:layout_weight="1" />
-
-                <android.support.design.widget.FloatingActionButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:clickable="true"
-                    app:fabSize="normal"
-                    android:layout_marginLeft="50dp"
                     android:layout_marginBottom="10dp"
                     app:srcCompat="@drawable/checkmark"
                     android:id="@+id/Done"

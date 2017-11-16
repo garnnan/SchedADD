@@ -28,6 +28,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.protocol.HTTP;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -120,92 +121,12 @@ public class UniqueActivity extends Fragment {
         new GetActivity(v).execute("https://schedadd-api.herokuapp.com/activities/",
                 ppt.getProperty("username"),ppt.getProperty("password"));
 
-        FloatingActionButton cancel = (FloatingActionButton) v.findViewById(R.id.Cancel);
-
-        cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v1) {
-                //Toast.makeText(getActivity(),"cancelar",Toast.LENGTH_SHORT).show();
-
-                //Toast.makeText(getContext(),object_finale.toString(),Toast.LENGTH_SHORT).show();
-
-                    //object_finale.put("state","Cancelado");
-                    new PutState(v).execute("https://schedadd-api.herokuapp.com/activities/",ppt.getProperty("username"),
-                            ppt.getProperty("password"),"Cancelado");
-
-
-                /*final JSONObject jsonObject;
-                try {
-                    ++ind;
-                    jsonObject = jsonArray.getJSONObject(ind);
-
-                    object_finale = jsonObject;
-
-                    if(jsonObject!=null) {
-
-                        TextView name = (TextView) v.findViewById(R.id.ActivityName);
-
-                        name.setText("Nombre: "+jsonObject.getString("name"));
-
-                        TextView description = (TextView) v.findViewById(R.id.Description2);
-
-                        description.setText(jsonObject.getString("description"));
-
-                        String st = jsonObject.getString("steps").replace(";", "\n");
-
-                        TextView steps = (TextView) v.findViewById(R.id.ActivitySteps);
-
-                        steps.setText(st);
-
-                        Button panic = (Button) v.findViewById(R.id.PanicActivity);
-
-                        panic.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                try {
-                                    new PanicCall().execute("https://schedadd-api.herokuapp.com/panicbuttoncalls/",
-                                            ppt.getProperty("username"), ppt.getProperty("password"),
-                                            String.valueOf(jsonObject.getInt("id")), ppt.getProperty("id_son"));
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-
-                                Intent intent = new Intent(Intent.ACTION_CALL);
-                                intent.setData(Uri.parse("tel:" + ppt.getProperty("cel")));
-                                //startActivity(intent);
-
-                                if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                    if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-                                        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CALL_PHONE}, 1);
-                                    } else {
-                                        startActivity(intent);
-                                    }
-                                } else {
-                                    startActivity(intent);
-                                }
-                            }
-                        });
-
-
-                        new LoadImages((ImageView) v.findViewById(R.id.ActivityImage)).execute(jsonObject.getString("imagePath"));
-                    }
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }*/
-
-
-            }
-        });
-
-        //final String basicAuth = "Basic"+ Base64.encodeToString((ppt.getProperty("username")+":"+ppt.getProperty("password")).getBytes(),Base64.NO_WRAP);
-
         FloatingActionButton done = (FloatingActionButton) v.findViewById(R.id.Done);
 
         done.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v1) {
-                //Toast.makeText(getActivity(),"hecho",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(),"hecho",Toast.LENGTH_SHORT).show();
 
                 new PutState(v).execute("https://schedadd-api.herokuapp.com/activities/",ppt.getProperty("username"),
                             ppt.getProperty("password"),"Hecho");
@@ -313,7 +234,7 @@ public class UniqueActivity extends Fragment {
 
                 object_finale.put("state",params[3]);
 
-                StringEntity se = new StringEntity(object_finale.toString());
+                StringEntity se = new StringEntity(object_finale.toString(), HTTP.UTF_8);
 
                 httpPut.setEntity(se);
 
