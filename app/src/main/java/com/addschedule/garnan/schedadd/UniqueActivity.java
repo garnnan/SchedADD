@@ -452,6 +452,30 @@ public class UniqueActivity extends Fragment {
                     new LoadImages((ImageView) v.findViewById(R.id.ActivityImage)).execute(jsonObject.getString("imagePath"));
                 }
 
+                else {
+
+
+
+                    TextView name = (TextView) v.findViewById(R.id.ActivityName);
+
+                    name.setEnabled(false);
+
+                    TextView description = (TextView) v.findViewById(R.id.Description2);
+
+                    description.setEnabled(false);
+
+                    TextView steps = (TextView) v.findViewById(R.id.ActivitySteps);
+
+                    steps.setEnabled(false);
+
+                    Button panic = (Button) v.findViewById(R.id.PanicActivity);
+
+                    panic.setEnabled(false);
+
+
+                }
+
+
             } catch (JSONException e) {
                 e.printStackTrace();
             } catch (ParseException e) {
