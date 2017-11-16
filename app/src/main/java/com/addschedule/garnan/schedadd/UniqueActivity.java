@@ -130,11 +130,11 @@ public class UniqueActivity extends Fragment {
                 //Toast.makeText(getContext(),object_finale.toString(),Toast.LENGTH_SHORT).show();
 
                     //object_finale.put("state","Cancelado");
-                    /*new PutState(v).execute("https://schedadd-api.herokuapp.com/activities/",ppt.getProperty("username"),
-                            ppt.getProperty("password"),"Cancelado");*/
+                    new PutState(v).execute("https://schedadd-api.herokuapp.com/activities/",ppt.getProperty("username"),
+                            ppt.getProperty("password"),"Cancelado");
 
 
-                final JSONObject jsonObject;
+                /*final JSONObject jsonObject;
                 try {
                     ++ind;
                     jsonObject = jsonArray.getJSONObject(ind);
@@ -192,7 +192,7 @@ public class UniqueActivity extends Fragment {
 
                 } catch (JSONException e) {
                     e.printStackTrace();
-                }
+                }*/
 
 
             }
@@ -207,11 +207,11 @@ public class UniqueActivity extends Fragment {
             public void onClick(View v1) {
                 //Toast.makeText(getActivity(),"hecho",Toast.LENGTH_SHORT).show();
 
-                /*new PutState(v).execute("https://schedadd-api.herokuapp.com/activities/",ppt.getProperty("username"),
-                            ppt.getProperty("password"),"Hecho");*/
+                new PutState(v).execute("https://schedadd-api.herokuapp.com/activities/",ppt.getProperty("username"),
+                            ppt.getProperty("password"),"Hecho");
 
 
-                final JSONObject jsonObject;
+                /*final JSONObject jsonObject;
                 try {
                     ++ind;
                     jsonObject = jsonArray.getJSONObject(ind);
@@ -269,7 +269,7 @@ public class UniqueActivity extends Fragment {
 
                 } catch (JSONException e) {
                     e.printStackTrace();
-                }
+                }*/
 
 
             }
@@ -309,7 +309,9 @@ public class UniqueActivity extends Fragment {
 
                 HttpClient httpClient = new DefaultHttpClient();
 
-                HttpPut httpPut = new HttpPut(params[0]+object_finale.getInt("id"));
+                HttpPut httpPut = new HttpPut(params[0]+object_finale.getInt("id")+"/");
+
+                object_finale.put("state",params[3]);
 
                 StringEntity se = new StringEntity(object_finale.toString());
 
@@ -505,7 +507,8 @@ public class UniqueActivity extends Fragment {
             //System.out.println(jsonArray.getJSONObject(0).getString("date"));
 
             for (int i=0;i<jsonArray.length();i++)
-                if ((convertercomp.compareTo(jsonArray.getJSONObject(i).getString("date")))<=0) {
+                if ((convertercomp.compareTo(jsonArray.getJSONObject(i).getString("date")))<=0
+                        && jsonArray.getJSONObject(i).getString("state").equals("Pendiente")) {
                     ind = i;
                     return jsonArray.getJSONObject(i);
 
