@@ -368,7 +368,7 @@ public class UniqueActivity extends Fragment {
 
             for (int i=0;i<jsonArray.length();i++)
                 if ((convertercomp.compareTo(jsonArray.getJSONObject(i).getString("date")))<=0
-                        && jsonArray.getJSONObject(i).getString("state").equals("Pendiente")) {
+                        && !jsonArray.getJSONObject(i).getString("state").equals("Hecho")) {
                     ind = i;
                     return jsonArray.getJSONObject(i);
 
