@@ -70,6 +70,14 @@ public class Preferences extends Fragment {
         }
     }
 
+    public  String gender(String g)
+    {
+        if(g.equals("M"))
+            return "Masculino";
+        else
+            return "Femenino";
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -84,7 +92,7 @@ public class Preferences extends Fragment {
 
         nombre.append(ppt.getProperty("name")+" "+ppt.getProperty("lastname"));
         cumple.append(ppt.getProperty("birth"));
-        sexo.append(ppt.getProperty("gender"));
+        sexo.append(gender(ppt.getProperty("gender")));
 
 
         b.setOnClickListener(new View.OnClickListener() {
